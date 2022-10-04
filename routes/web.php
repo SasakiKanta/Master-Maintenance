@@ -16,3 +16,18 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+Route::get('/home', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::middleware(['auth'])->group(function () {
+
+    // 利用者マスタ検索(users)
+    Route::prefix("users")->group(function () {
+        Route::get('', [App\Http\Controllers\UsersController::class, 'index'])->name('users.index');
+        Route::get('entry', [App\Http\Controllers\UsersController::class, 'entry'])->name('users.entry');
+        Route::get('{id}', [App\Http\Controllers\UsersController::class, 'edit'])->where('id', '[0-9]+');
+        Route::match(['get','post'], 'search', [App\Http\Controllers\UsersController::class, 'search'])->name('users.search');
+    });
+});

@@ -1,0 +1,79 @@
+@import "tailwindcss/base";
+
+@import "tailwindcss/components";
+
+@import "tailwindcss/utilities";
+
+
+.main {
+    @apply lg:container lg:mx-auto lg:mt-5;
+}
+.section {
+    @apply flex flex-col break-words bg-white;
+}
+
+.section-header {
+    @apply font-semibold bg-gray-200 text-gray-700 py-5 px-6 sm:py-6 sm:px-8 sm:rounded-t-md;
+}
+
+.form-tag {
+    @apply w-full px-6 space-y-6 sm:px-10 sm:space-y-8;
+}
+
+.search-condition {
+    @apply grid gap-6 mb-6 md:grid-cols-2;
+}
+
+.list-table {
+    @apply min-w-max w-full table-auto;
+}
+
+.list-table-head {
+    @apply border-b bg-gray-500;
+}
+
+.list-table-body {
+    @apply text-gray-600 text-sm font-light;
+}
+
+.list-table-body-tr {
+    @apply border-b border-gray-200 hover:bg-gray-100;
+}
+
+.list-table-head-tr {
+    @apply bg-gray-600 text-gray-100 uppercase text-sm leading-normal;
+}
+
+
+.label {
+    @apply block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300;
+}
+
+.input-text {
+    @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
+}
+
+.search-btn {
+    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded;
+}
+
+.new-btn {
+    @apply bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded;
+}
+
+button.sort_button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    width: 100%;
+    /* text-decoration: underline; */
+}
+  
+button.sort_button_up::after {
+    content: '　▲';
+    /* float: right; */
+}
+button.sort_button_down::after {
+    content: '　▼';
+    /* float: right; */
+}
