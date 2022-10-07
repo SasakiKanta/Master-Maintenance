@@ -22,6 +22,6 @@ return [
     'min'    => [
         'string'  => ':attributeは、:min文字以上で指定してください。',
     ],
-    'unique' => ':attributeの値は既に存在しています。',
+    'unique' => ':attributeは既に使用されています。',
     'required' => ':attributeは必ず指定してください。',
 ];

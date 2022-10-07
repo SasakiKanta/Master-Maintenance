@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UserEditRequest extends FormRequest
 {
@@ -24,11 +25,12 @@ class UserEditRequest extends FormRequest
      */
     public function rules()
     {
+        $id = $this->get('id');
         return [
             // バリデーションの設定
-            'id' => ['required'],
+            'id' => ['string', 'required'],
             'name' => ['string', 'max:255'],
-            'email' => ['string', 'email', 'max:255'],
+            'email' => ['email', 'max:255', "unique:users,email,${id},id,is_deleted,0"],
             'password' => ['sometimes', 'nullable', 'min:8'],
         ];
     }
