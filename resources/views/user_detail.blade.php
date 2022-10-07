@@ -57,8 +57,12 @@
           </div>
           <div>
             <label for="last_name" class="label">アカウントロック</label>
-            <input type="radio" name="lock" value="true">
-            <input type="radio" name="lock" value="false">
+            <input id="default-checkbox" name="isLocked" type="checkbox" value="1" class="check-box"
+              @if ($isLocked)
+                checked
+              @endif
+              >
+            <label for="default-checkbox" class="check-box-label"></label>
           </div>
           <div class="flex">
             <!-- 削除ボタン -->

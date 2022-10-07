@@ -23,12 +23,12 @@
           <!-- 検索フォーム -->
           <div class="search-condition">
             <div>
-                <label for="first_name" class="label">氏名</label>
-                <input type="text" id="name" name="name" value="{{$name}}" class="input-text" placeholder="">
+              <label for="first_name" class="label">氏名</label>
+              <input type="text" id="name" name="name" value="{{$name}}" class="input-text" placeholder="">
             </div>
             <div>
-                <label for="last_name" class="label">メールアドレス</label>
-                <input type="text" id="email" name="email" value="{{$email}}" class="input-text" placeholder="">
+              <label for="last_name" class="label">メールアドレス</label>
+              <input type="text" id="email" name="email" value="{{$email}}" class="input-text" placeholder="">
             </div>
           </div>
 
@@ -59,17 +59,35 @@
                       class="sort_button @if($st3=='up') sort_button_up @elseif($st3=='down') sort_button_down @endif"
                       value=@if($st3=='up') "down" @else "up" @endif>メールアドレス</button>
                   </th>
+                  <th scope="col" class="py-2">
+                    <button name="st3"
+                      class="sort_button @if($st3=='up') sort_button_up @elseif($st3=='down') sort_button_down @endif"
+                      value=@if($st3=='up') "down" @else "up" @endif>アカウントロック</button>
+                  </th>
                 </tr>
               </thead>
               <!-- 一覧部 -->
               <tbody class="list-table-body">
-                <?php foreach ($users as $user) { ?>
+                <?php
+                  $i=1;
+                  foreach ($users as $user) { ?>
                   <tr class="list-table-body-tr">
                     <td class="py-2 px-4">{{$user->id}}</td>
                     <td class="py-2 px-4"><a href="/users/{{$user->id}}">{{$user->name}}</a></td>
                     <td class="py-2 px-4">{{ $user->email}}</td>
+                    <td class="py-2 px-4 text-center">
+                      <input name="isLocked{{$i}}" type="radio" class="radio-buton" readonly
+                        @if ($user->is_locked)
+                          checked
+                        @else
+                        hidden
+                        @endif
+                        >
+                    </td>
                   </tr>
-                <?php }  ?>
+                <?php 
+                  $i++;
+                }  ?>
               </tbody>
             </table>
             <!-- ページング -->

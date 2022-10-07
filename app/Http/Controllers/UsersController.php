@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Flag;
 use App\Http\Requests\UserEntryRequest;
 use App\Http\Requests\UserEditRequest;
 use App\Http\Requests\UserRequest;
@@ -42,6 +43,7 @@ class UsersController extends Controller
         return view('user_detail', [
             'name'  => '',
             'email' => '',
+            'isLocked' => Flag::OFF,
         ]);
     }
 
@@ -58,9 +60,10 @@ class UsersController extends Controller
 
         // 各値を設定し、画面に返却
         return view('user_detail', [
-            'id'    => $id,
-            'name'  => $user->name,
-            'email' => $user->email,
+            'id'      => $id,
+            'name'    => $user->name,
+            'email'   => $user->email,
+            'isLocked' => $user->is_locked,
         ]);
     }
 

@@ -92,8 +92,12 @@ class User extends Authenticatable
         if(isset($inputAll['password'])) {
             $user->password = Hash::make($inputAll['password']);
         }
-        if(isset($inputAll['is_locked'])) {
-            $user->is_locked = $inputAll['is_locked'];
+        if(isset($inputAll['isLocked'])) {
+            // チェックボックスチェック時
+            $user->is_locked = Flag::ON;
+        } else {
+            // チェックボックス未チェック時
+            $user->is_locked = Flag::OFF;
         }
 
         // 登録・更新項目の設定
