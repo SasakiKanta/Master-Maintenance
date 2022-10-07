@@ -9,6 +9,7 @@
           ユーザーマスタ
         </header>
 
+        <!-- メッセージ部 -->
         @if (session('flash_message'))
         <div class="flash flash-info ">
           <span class="ui-icon ui-icon-check"></span>
@@ -19,6 +20,7 @@
         <form class="form-tag" method="POST" action="{{ route('users.search') }}">
           @csrf
 
+          <!-- 検索フォーム -->
           <div class="search-condition">
             <div>
                 <label for="first_name" class="label">氏名</label>
@@ -26,7 +28,7 @@
             </div>
             <div>
                 <label for="last_name" class="label">メールアドレス</label>
-                <input type="text" id="email" name="email" value="{{$email}}" class="input-text" placeholder="" reired>
+                <input type="text" id="email" name="email" value="{{$email}}" class="input-text" placeholder="">
             </div>
           </div>
 
@@ -35,9 +37,11 @@
             <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('users.entry') }}';return false;">新規登録</button>
           </div>
 
+          <!-- 一覧表示 -->
           <?php if (isset($users)) {  ?>
           <div class="flex flex-col">
             <table class="list-table">
+              <!-- 一覧見出し部 -->
               <thead class="list-table-head">
                 <tr class="list-table-head-tr">
                   <th scope="col" class="py-2">
@@ -57,6 +61,7 @@
                   </th>
                 </tr>
               </thead>
+              <!-- 一覧部 -->
               <tbody class="list-table-body">
                 <?php foreach ($users as $user) { ?>
                   <tr class="list-table-body-tr">
@@ -67,6 +72,7 @@
                 <?php }  ?>
               </tbody>
             </table>
+            <!-- ページング -->
             <div class="my-10">
               {{ $users->appends($pagenateParams)->links() }}
             </div>
@@ -81,6 +87,7 @@
 
 @push('app-script')
 <script>
+    // 新規登録押下時の処理
     function doAction(actionNo) {
       var formInfo = document.forms[1];
       var action = new String();
