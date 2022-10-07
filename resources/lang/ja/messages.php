@@ -8,4 +8,5 @@ return [
     'regist.complete' => '登録が完了しました。',
     'update.complete' => '更新が完了しました。',
     'delete.complete' => '削除が完了しました。',
+    'error.info'      => '入力内容を確認してください。',
 ];

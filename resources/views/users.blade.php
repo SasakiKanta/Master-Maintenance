@@ -34,7 +34,7 @@
 
           <div class="flex">
             <button class="search-btn" type="submit">検索</button>
-            <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('users.entry') }}';return false;">新規登録</button>
+            <button type="button" class="update-btn ml-auto" onclick="location.href='{{ route('users.entry') }}';return false;">新規登録</button>
           </div>
 
           <!-- 一覧表示 -->

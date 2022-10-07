@@ -23,11 +23,9 @@
         <!-- エラーメッセージ部 -->
         @if ($errors->any())
         <div class="flash-err">
-          <ul class="mb-2">
-            <!-- 全てのエラーを出力 -->
-            @foreach ($errors->all() as $error)
-            <li class="mb-1">{{ $error }}</li>
-            @endforeach
+          <ul class="mb-1">
+            <!-- エラーを出力 -->
+            <li>{{ trans('messages.error.info') }}</li>
           </ul>
         </div>
         @endif 
@@ -44,16 +42,27 @@
           @csrf
           <div>
             <label for="first_name" class="label">氏名</label>
-            <input type="text" id="name" name="name" value="{{old('name', $name)}}" class="input-text" placeholder="">
+            <input type="text" id="name" name="name" value="{{old('name', $name)}}"
+              class="@error('name') error-text @enderror input-text" placeholder="">
+            @error('name')
+            <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+            @enderror
           </div>
           <div>
             <label for="last_name" class="label">メールアドレス</label>
-            <input type="text" id="email" name="email" value="{{old('email', $email)}}" class="input-text" placeholder="" required>
+            <input type="text" id="email" name="email" value="{{old('email', $email)}}" 
+              class="@error('email') error-text @enderror input-text" placeholder="" required>
+            @error('email')
+              <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+            @enderror
           </div>
           <div>
             <label for="last_name" class="label">パスワード</label>
             <input type="password"
-              class="input-text form-input w-full @error('password') border-red-500 @enderror" name="password">
+              class="@error('password') error-text @enderror input-text form-input w-full" name="password">
+              @error('password')
+              <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+              @enderror
           </div>
           <div>
             <label for="last_name" class="label">アカウントロック</label>
@@ -66,13 +75,13 @@
           </div>
           <div class="flex">
             <!-- 削除ボタン -->
-            <button type="button" class="new-btn" onclick="doAction()"
+            <button type="button" class="delete-btn" onclick="doAction()"
               @if(!isset($id))
                 hidden
               @endif
               >削除</button>
             <!-- 登録・更新ボタン -->
-            <button type="submit" class="new-btn ml-auto">
+            <button type="submit" class="update-btn ml-auto">
               @if(!isset($id))
                 登録
               @else
