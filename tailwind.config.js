@@ -1,13 +1,13 @@
 module.exports = {
-  purge: [
-    './storage/framework/views/*.php',
+  content: [
+    './storage/framework/views/**/*.php',
     './resources/views/**/*.blade.php',
     './resources/css/**/*.css',
     './resources/**/*.js',
   ],
   theme: {
-    extend: {}
   },
-  variants: {},
-  plugins: []
+  plugins: [
+    require('flowbite/plugin')
+],
 }
