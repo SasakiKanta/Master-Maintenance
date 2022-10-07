@@ -232,6 +232,9 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
 
+        // custom
+        'BreadcrumbHelper' => App\Helpers\BreadcrumbHelper::class,
+
         // Emuns
         'Flag' =>  App\Enums\Flag::class,
     ],

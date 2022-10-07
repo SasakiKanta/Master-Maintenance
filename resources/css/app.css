@@ -6,14 +6,14 @@
 
 
 .main {
-    @apply lg:container lg:mx-auto lg:mt-5;
+    @apply sm:container sm:mx-auto sm:mt-5;
 }
 .section {
-    @apply flex flex-col break-words bg-white;
+    @apply flex flex-col break-words bg-white mt-5 sm:rounded-md sm:shadow-sm sm:shadow-lg;
 }
 
 .section-header {
-    @apply font-semibold bg-gray-200 text-gray-700 py-5 px-6 sm:py-6 sm:px-8 sm:rounded-t-md;
+    @apply font-semibold bg-gray-200 text-gray-700 py-3 px-6 sm:py-4 sm:px-8 sm:rounded-t-md;
 }
 
 .form-tag {
@@ -32,16 +32,16 @@
     @apply border-b bg-gray-500;
 }
 
+.list-table-head-tr {
+    @apply bg-gray-600 text-gray-100 uppercase text-sm leading-normal;
+}
+
 .list-table-body {
-    @apply text-gray-600 text-sm font-light;
+    @apply text-gray-800 text-sm;
 }
 
 .list-table-body-tr {
-    @apply border-b border-gray-200 hover:bg-gray-100;
-}
-
-.list-table-head-tr {
-    @apply bg-gray-600 text-gray-100 uppercase text-sm leading-normal;
+    @apply text-gray-800 border-b border-gray-200 hover:bg-gray-100;
 }
 
 .label {
@@ -72,12 +72,16 @@
     @apply bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded;
 }
 
+.edit-btn {
+    @apply bg-gray-500 hover:bg-gray-700 text-white py-1 px-3 rounded text-xs;
+}
+
 .flash-info {
-    @apply bg-blue-100 border border-blue-500 text-blue-700 px-4 py-3 rounded
+    @apply bg-blue-100 border border-blue-500 text-blue-700 px-4 py-3 rounded mt-3 mx-10;
 }
 
 .flash-err {
-    @apply bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded
+    @apply bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-3 mx-10;
 }
 
 .check-box {
@@ -90,6 +94,25 @@
 
 .radio-buton {
     @apply w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500
+}
+
+.form-input {
+    @apply bg-gray-50 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight;
+}
+
+.form-input:focus {
+    @apply outline-none;
+}
+
+.valid-msg {
+    @apply mt-2 text-sm text-red-600 dark:text-red-500;
+}
+
+.badge-green {
+    @apply bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900;
+}
+.badge-red {
+    @apply bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900;
 }
 
 button.sort_button {
