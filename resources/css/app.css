@@ -13,7 +13,7 @@
 }
 
 .section-header {
-    @apply font-semibold bg-gray-200 text-gray-700 py-3 px-6 sm:py-4 sm:px-8 sm:rounded-t-md;
+    @apply font-semibold bg-gray-300 text-gray-700 py-3 px-6 sm:py-4 sm:px-8 sm:rounded-t-md;
 }
 
 .form-tag {
