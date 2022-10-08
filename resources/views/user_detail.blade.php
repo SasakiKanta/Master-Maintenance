@@ -13,10 +13,10 @@
 
     <section class="section">
       <header class="section-header">
-      @if (!isset($id))
-        ユーザー登録
-      @else
+      @if ($id)
         ユーザー更新
+      @else
+        ユーザー登録
       @endif
       </header>
 
@@ -77,17 +77,13 @@
         </div>
         <div class="flex">
           <!-- 削除ボタン -->
-          <button type="button" class="delete-btn" onclick="doAction()"
-            @if(!isset($id))
-              hidden
-            @endif
-            >削除</button>
+          <button type="button" class="delete-btn" onclick="doAction()" @if(!$id) hidden @endif>削除</button>
           <!-- 登録・更新ボタン -->
           <button type="submit" class="update-btn ml-auto">
-            @if(!isset($id))
-              登録
-            @else
+            @if($id)
               更新
+            @else
+              登録
             @endif
           </button>
         </div>
