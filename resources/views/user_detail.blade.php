@@ -77,16 +77,16 @@
           <label for="is-locked" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">アカウントロック</label>
         </div>
         <div class="flex">
-          <!-- 削除ボタン -->
-          <button type="button" class="delete-btn" onclick="doAction()" @if(!$id) hidden @endif>削除</button>
           <!-- 登録・更新ボタン -->
-          <button type="submit" class="update-btn ml-auto">
+          <button type="submit" class="update-btn">
             @if($id)
               更新
             @else
               登録
             @endif
           </button>
+          <!-- 削除ボタン -->
+          <button type="button" class="delete-btn ml-auto" onclick="doAction()" @if(!$id) hidden @endif>削除</button>
         </div>
       </form>
     </section>
