@@ -53,7 +53,7 @@ class UserEntryRequest extends FormRequest
     {
         return [
             // 項目名称の設定
-            'name'     => '氏名',
+            'name'     => '名前',
             'email'    => 'メールアドレス',
             'password' => 'パスワード',
         ];

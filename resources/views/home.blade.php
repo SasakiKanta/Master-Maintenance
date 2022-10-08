@@ -13,7 +13,7 @@
         <section class="section">
 
             <header class="section-header">
-                Home
+                ホーム
             </header>
 
             <div class="w-full p-6">

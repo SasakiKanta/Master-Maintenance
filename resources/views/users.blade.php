@@ -6,7 +6,7 @@
     <!-- パンくず -->
     <?php
       $bc = array();
-      array_push($bc, ['Users', '']);
+      array_push($bc, ['ユーザー', '']);
     ?>
     {!! BreadcrumbHelper::tag($bc) !!}
 
@@ -28,7 +28,7 @@
         @csrf
         <div class="search-condition">
           <div>
-            <label for="first_name" class="label">氏名</label>
+            <label for="first_name" class="label">名前</label>
             <input type="text" id="name" name="name" value="{{$name}}" class="input-text" placeholder="">
           </div>
           <div>
@@ -67,9 +67,9 @@
                 <td class="py-2 px-4">{{ $user->email}}</td>
                 <td class="py-2 px-4 text-center">
                   @if ($user->is_locked)
-                  <span class="badge-red">Locked</span>
+                  <span class="badge-red">ロック</span>
                   @else
-                  <span class="badge-green">Effective</span>
+                  <span class="badge-green">有効</span>
                   @endif
                 </td>
                 <td class="text-center">

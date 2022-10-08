@@ -6,8 +6,8 @@
     <!-- パンくず -->
     <?php
       $bc = array();
-      array_push($bc, ['Users', route('users.index')]);
-      array_push($bc, ['UserEdit', '']);
+      array_push($bc, ['ユーザー', route('users.index')]);
+      array_push($bc, ['ユーザー編集', '']);
     ?>
     {!! BreadcrumbHelper::tag($bc) !!}
 
@@ -43,7 +43,7 @@
         <input type="hidden" id="form-method" name="_method" value="{{ $id? 'POST': 'PUT'; }}">
 
         <div>
-          <label for="first_name" class="label">氏名</label>
+          <label for="first_name" class="label">名前</label>
           <input type="text" id="name" name="name" value="{{old('name', $name)}}"
             class="@error('name') error-text @enderror input-text" placeholder="">
           @error('name')

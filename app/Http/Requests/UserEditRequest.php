@@ -53,21 +53,10 @@ class UserEditRequest extends FormRequest
     {
         return [
             // 項目名称の設定
-            'name'     => '氏名',
+            'name'     => '名前',
             'email'    => 'メールアドレス',
             'password' => 'パスワード',
         ];
     }
 
-    // /**
-    //  * バリデーション実行後エラーを振替
-    //  *
-    //  */
-    // public function withValidator(Validator $validator)
-    // {
-    //     // 以下のエラーをExceptionに振り替える
-    //     $validator->sometimes('password', 'present|min:8', function () {
-    //         return 'present|min:8';
-    //     });
-    // }
 }
