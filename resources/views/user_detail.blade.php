@@ -43,7 +43,7 @@
         <input type="hidden" id="form-method" name="_method" value="{{ $id? 'POST': 'PUT'; }}">
 
         <div>
-          <label for="first_name" class="label">名前</label>
+          <label for="first_name" class="label">名前<span class="require-label"></span></label>
           <input type="text" id="name" name="name" value="{{old('name', $name)}}"
             class="@error('name') error-text @enderror input-text" placeholder="">
           @error('name')
@@ -51,7 +51,7 @@
           @enderror
         </div>
         <div>
-          <label for="last_name" class="label">メールアドレス</label>
+          <label for="last_name" class="label">メールアドレス<span class="require-label"></span></label>
           <input type="text" id="email" name="email" value="{{old('email', $email)}}" 
             class="@error('email') error-text @enderror input-text" placeholder="">
           @error('email')
@@ -59,21 +59,22 @@
           @enderror
         </div>
         <div>
-          <label for="last_name" class="label">パスワード</label>
+          <label for="last_name" class="label">パスワード@if(!$id)<span class="require-label"></span>@endif</label>
           <input type="password"
             class="@error('password') error-text @enderror input-text form-input w-full" name="password">
             @error('password')
             <p class="valid-msg">{{ $message }}</p>
             @enderror
         </div>
-        <div>
-          <label for="last_name" class="label">アカウントロック</label>
-          <input id="default-checkbox" name="isLocked" type="checkbox" value="1" class="check-box"
+        <div class="flex items-start mb-6">
+          <div class="flex items-center h-5">
+            <input type="checkbox" id="is-locked" name="isLocked" value="1" class="check-box"
             @if ($isLocked)
               checked
             @endif
             >
-          <label for="default-checkbox" class="check-box-label"></label>
+          </div>
+          <label for="is-locked" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">アカウントロック</label>
         </div>
         <div class="flex">
           <!-- 削除ボタン -->

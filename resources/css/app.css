@@ -115,8 +115,21 @@
 .badge-green {
     @apply bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900;
 }
+
 .badge-red {
     @apply bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900;
+}
+
+.badge-yellow {
+    @apply bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-200 dark:text-yellow-900;
+}
+
+.require-label {
+    @apply bg-red-200 text-red-800 text-xs px-2.5 py-0.5 rounded ml-5;
+}
+
+.require-label::after {
+    content: '必須';
 }
 
 button.sort_button {

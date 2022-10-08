@@ -67,7 +67,7 @@
                 <td class="py-2 px-4">{{ $user->email}}</td>
                 <td class="py-2 px-4 text-center">
                   @if ($user->is_locked)
-                  <span class="badge-red">ロック</span>
+                  <span class="badge-yellow">ロック</span>
                   @else
                   <span class="badge-green">有効</span>
                   @endif
