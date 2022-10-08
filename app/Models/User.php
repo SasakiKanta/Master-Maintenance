@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\Flag;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
@@ -15,24 +16,20 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+    use SoftDeletes;
+    use BaseTrait;
 
     /**
      * The attributes that are not mass assignable.
      *
      * @var array
      */
-    protected $guarded = ['created_at', 'updated_at'];
-
-    // /**
-    //  * The attributes that are mass assignable.
-    //  *
-    //  * @var array<int, string>
-    //  */
-    // protected $fillable = [
-    //     'name',
-    //     'email',
-    //     'password',
-    // ];
+    protected $guarded = [
+        'id',
+        'created_at', 
+        'updated_at',
+        'deleted_at',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -42,6 +39,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'created_at', 
+        'updated_at',
+        'deleted_at'
     ];
 
     /**
@@ -53,45 +53,40 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * 一覧検索
-     * @return $query
-     */
-    public static function getList()
-    {
-        $query = User::query()
-            ->where('is_deleted' ,'=', Flag::OFF);
+    protected $dates = [
+        'deleted_at'
+    ];
 
-        return $query;
+    /**
+     * パスワードのハッシュ化
+     *
+     * @param string $password
+     * @return void
+     */
+    public function setPasswordAttribute($password)
+    {
+        if ($password) {
+            $this->attributes['password'] = Hash::make($password);
+        } else {
+            unset($this->attributes['password']);
+        }
     }
 
     /**
      * 利用者 登録、更新
      *
-     * @param [type] $inputAll
-     * @param [type] $loginStaffId
+     * @param $id ID
+     * @param array $inputAll
      * @return object
      */
-    public static function upsertData($inputAll, $loginStaffId) {
-        if (!isset($inputAll['id'])) {
-            // 登録の場合
-            $user = new User;
-            $user->created_by = $loginStaffId;
-        } else {
-            // 修正の場合
-            $user = User::find($inputAll['id']);
-        }
+    public static function upsertData($id, $inputAll) {
+
+        $user = User::firstOrNew(['id' => $id]);
 
         // 値が設定されている場合のみ、登録・更新として設定
-        if(isset($inputAll['name'])) {
-            $user->name = $inputAll['name'];
-        }
-        if(isset($inputAll['email'])) {
-            $user->email = $inputAll['email'];
-        }
-        if(isset($inputAll['password'])) {
-            $user->password = Hash::make($inputAll['password']);
-        }
+        $user->fill($inputAll);
+
+        // アカウントロック
         if(isset($inputAll['isLocked'])) {
             // チェックボックスチェック時
             $user->is_locked = Flag::ON;
@@ -101,25 +96,8 @@ class User extends Authenticatable
         }
 
         // 登録・更新項目の設定
-        $user->email_verified_at = Carbon::now();
-        $user->updated_by = $loginStaffId;
         $user->save();
 
-        return $user;
-    }
-
-    /**
-     * 利用者の論理削除
-     *
-     * @param [type] $id
-     * @param [type] $loginStaffId
-     * @return object
-     */
-    public static function deleteData($id, $loginStaffId) {
-        $user = User::find($id);
-        $user->is_deleted = true;
-        $user->updated_by = $loginStaffId;
-        $user->save();
         return $user;
     }
 }
