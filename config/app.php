@@ -233,10 +233,14 @@ return [
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
 
         // custom
+        'V' => App\Helpers\ViewHelper::class,
         'BreadcrumbHelper' => App\Helpers\BreadcrumbHelper::class,
 
         // Emuns
         'Flag' =>  App\Enums\Flag::class,
     ],
 
+    'settings' => [
+        'page_limit' => env('PAGE_LIMIT', 10),
+    ],
 ];
