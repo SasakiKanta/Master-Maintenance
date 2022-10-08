@@ -14,9 +14,9 @@
     <section class="section">
       <header class="section-header">
       @if (!isset($id))
-      ユーザー登録
+        ユーザー登録
       @else
-      ユーザー更新
+        ユーザー更新
       @endif
       </header>
 
@@ -38,15 +38,10 @@
       @endif 
 
       <!-- 入力フォーム -->
-      @if (!isset($id))
-      <!-- 登録 -->
-      <form id="edit-form" class="form-tag" method="POST" action="{{ route('users.insert') }}">
-      @else
-      <!-- 更新 -->
-      <form id="edit-form" class="form-tag" method="POST" action="{{ route('users.update') }}">
-        <input type="hidden" id="id" name="id" value="{{$id}}">
-      @endif
+      <form id="edit-form" class="form-tag" method="POST" action="{{ route('users.update', $id) }}">
         @csrf
+        <input type="hidden" id="form-method" name="_method" value="{{ $id? 'POST': 'PUT'; }}">
+
         <div>
           <label for="first_name" class="label">氏名</label>
           <input type="text" id="name" name="name" value="{{old('name', $name)}}"
@@ -108,7 +103,8 @@
   function doAction() {
     if (confirm('削除します。よろしいですか？')) {
       let form = document.getElementById('edit-form');
-      form.action = "{{ route('users.delete') }}";
+      form.action = "{{ route('users.delete', $id) }}";
+      document.getElementById('form-method').value = 'DELETE';
       form.submit();
     }
   }

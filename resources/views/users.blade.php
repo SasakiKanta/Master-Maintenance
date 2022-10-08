@@ -23,10 +23,9 @@
       </div>
       @endif
 
+      <!-- 検索フォーム -->
       <form id="search-form" class="form-tag" method="POST" action="{{ route('users.search') }}">
         @csrf
-
-        <!-- 検索フォーム -->
         <div class="search-condition">
           <div>
             <label for="first_name" class="label">氏名</label>
@@ -39,32 +38,22 @@
         </div>
 
         <div class="flex">
-          <button class="search-btn" type="submit">検索</button>
+          <button type="submit"class="search-btn" >検索</button>
+          <button type="button" class="clear-btn ml-4" onclick="location.href='{{ route('users.clear') }}';return false;">クリア</button>
           <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('users.entry') }}';return false;">新規登録</button>
         </div>
-
-        <!-- 一覧表示 -->
-        <?php if (isset($users)) {  ?>
+      </form>
+      <!-- 一覧表示 -->
+      <?php if (isset($users)) {  ?>
+      <form id="list-form" class="form-tag" method="GET" action="{{ route('users.paging') }}">
         <div class="flex flex-col">
           <table class="list-table">
             <!-- 一覧見出し部 -->
             <thead class="list-table-head">
               <tr class="list-table-head-tr">
-                <th scope="col" class="py-2">
-                  <button name="st1"
-                    class="sort_button @if($st1=='up') sort_button_up @elseif($st1=='down') sort_button_down @endif"
-                    value=@if($st1=='up') "down" @else "up" @endif>ＩＤ</button>
-                </th>
-                <th scope="col" class="py-2">
-                  <button name="st2"
-                    class="sort_button @if($st2=='up') sort_button_up @elseif($st2=='down') sort_button_down @endif"
-                    value=@if($st2=='up') "down" @else "up" @endif>氏名</button>
-                </th>
-                <th scope="col" class="py-2">
-                  <button name="st3"
-                    class="sort_button @if($st3=='up') sort_button_up @elseif($st3=='down') sort_button_down @endif"
-                    value=@if($st3=='up') "down" @else "up" @endif>メールアドレス</button>
-                </th>
+                <th scope="col" class="py-2">{!! V::sortButton('id', 'ID', $sort) !!}</th>
+                <th scope="col" class="py-2">{!! V::sortButton('name', '名前', $sort) !!}</th>
+                <th scope="col" class="py-2">{!! V::sortButton('email', 'メールアドレス', $sort) !!}</th>
                 <th scope="col" class="py-2">アカウントロック</th>
                 <th>&nbsp;</th>
               </tr>
@@ -90,13 +79,16 @@
             <?php } ?>
             </tbody>
           </table>
+          @if (count($users) == 0)
+              <div class="mt-10 text-center">対象データなし</div>
+          @endif
           <!-- ページング -->
-          <div class="my-10">
-            {{ $users->appends($pagenateParams)->links() }}
+          <div class="mt-10">
+            {{ $users->links() }}
           </div>
         </div>
-        <?php }  ?>
       </form>
+      <?php }  ?>
     </section>
   </div>
 </main>

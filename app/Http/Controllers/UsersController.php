@@ -2,45 +2,68 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Enums\Flag;
 use App\Http\Requests\UserEntryRequest;
 use App\Http\Requests\UserEditRequest;
-use App\Http\Requests\UserRequest;
 use App\Models\User;
-use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 /**
  * 利用者マスタ検索 コントローラークラス
  */
 class UsersController extends Controller
 {
+    /** セッションキー */
+    protected $SESSION_KEY = 'USERS';
+
+    /** ソートカラム */
+    protected $SORT_TARGET = ['id', 'name', 'email'];
+
     /**
      * 検索画面初期表示
      *
      * @param Request $request
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return view
      */
     public function index(Request $request)
     {
-        // 初期化
+        if ($request->session()->has($this->SESSION_KEY)) {
+            return $this->doSearch($request);
+        }
+
+        return view('users', [
+            'name'  =>'',
+            'email' => '',
+        ]);
+    }
+
+    /**
+     * クリアボタン
+     *
+     * @param Request $request
+     * @return route
+     */
+    public function clear(Request $request)
+    {
+        // セッション削除
         $this->clearSession($request);
-        return view('users', $this->initPageObject($request));
+        // indexへリダイレクト
+        return redirect()->route('users.index');
     }
 
     /**
      * 新規登録画面表示
      *
      * @param Request $request
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return view
      */
     public function entry(Request $request)
     {
         // 画面に初期値を設定
         return view('user_detail', [
+            'id'  => 0,
             'name'  => '',
             'email' => '',
             'isLocked' => Flag::OFF,
@@ -50,13 +73,13 @@ class UsersController extends Controller
     /**
      * 参照画面表示
      *
+     * @param $id ID
      * @param Request $request
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return view
      */
-    public function edit(Request $request)
+    public function edit($id, Request $request)
     {
-        $id = $request->id;
-        $user = User::find($id);
+        $user = User::findOrFail($id);
 
         // 各値を設定し、画面に返却
         return view('user_detail', [
@@ -71,15 +94,16 @@ class UsersController extends Controller
      * 登録処理
      *
      * @param UserEntryRequest $request
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @param $id ID
+     * @return route
      */    
-    public function insert(UserEntryRequest $request)
+    public function insert(UserEntryRequest $request, $id = 0)
     {
         // リクエストパラメータの取得
         $inputAll = $request->all();
 
         // 登録内部処理
-        $user = $this->upsert($inputAll);
+        $user = $this->upsert($id, $inputAll);
         $userId = $user->id;
 
         // メッセージの作成(messages.phpより本文を取得)
@@ -94,130 +118,123 @@ class UsersController extends Controller
     /**
      * 更新処理
      *
+     * @param $id ID
      * @param UserEditRequest $request
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return route
      */    
-    public function update(UserEditRequest $request)
+    public function update($id, UserEditRequest $request)
     {
         // リクエストパラメータの取得
         $inputAll = $request->all();
 
         // 更新内部処理
-        $user = $this->upsert($inputAll);
+        $this->upsert($id, $inputAll);
 
         // メッセージの作成(messages.phpより本文を取得)
         $completeMessage = trans('messages.update.complete');
 
         // 各データ設定後、編集画面にリダイレクト
         return redirect()->route('users.edit', [
-            'id' => $inputAll['id'],
+            'id' => $id,
         ])->with('flash_message', $completeMessage);
     }
 
     /**
      * 登録・更新内部処理
      *
+     * @param $id ID
      * @param $inputAll
      * @return $user
      */
-    public function upsert($inputAll)
+    public function upsert($id, $inputAll)
     {
-        // ログイン者IDの設定
-        $loginStaffId = Auth::id();
-
-        try {
-            // トランザクション開始
-            DB::beginTransaction();
-
+        return DB::transaction(function () use ($id, $inputAll) {
             // データの登録・更新
-            $user = User::upsertData($inputAll, $loginStaffId);
-
-            // コミット
-            DB::commit();
-
+            $user = User::upsertData($id, $inputAll);
             return $user;
-        // エラー発生時処理
-        } catch (Exception $e) {
-            // ロールバック
-            DB::rollBack();
-            throw $e;
-        }
+        });
     }
 
     /**
      * 削除処理
      *
+     * @param $id ID
      * @param Request $request
-     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return route
      */
-    public function delete(Request $request)
+    public function delete($id, Request $request)
     {
-        // ログイン者IDの設定
-        $loginStaffId = Auth::id();
+        // データの削除
+        User::findOrFail($id)->delete();
 
-        // リクエストパラメータの取得
-        $inputAll = $request->all();
+        // メッセージの作成(messages.phpより本文を取得)
+        $completeMessage = trans('messages.delete.complete');
 
-        try {
-            // トランザクション開始
-            DB::beginTransaction();
-
-            // データの削除
-            User::deleteData($inputAll['id'], $loginStaffId);
-
-            // コミット
-            DB::commit();
-
-            // メッセージの作成(messages.phpより本文を取得)
-            $completeMessage = trans('messages.delete.complete');
-
-            // 各データ設定後、編集画面にリダイレクト
-            return redirect()->route('users.index')
-                ->with('flash_message', $completeMessage);
-
-        // エラー発生時処理
-        } catch (Exception $e) {
-            // ロールバック
-            DB::rollBack();
-            throw $e;
-        }
+        // 各データ設定後、編集画面にリダイレクト
+        return redirect()->route('users.index')
+            ->with('flash_message', $completeMessage);
     }
 
     /**
-     * 一覧画面表示
+     * 検索
      * 
      * @param Request $request
      * @return view
      */
     public function search(Request $request)
     {
-        // ページ情報の取得
-        $page = $request->page;
+        // セッション削除
+        $this->clearSession($request);
+        // 検索
+        return $this->doSearch($request);
+    }
 
-        // ページングの有無により設定元を制御
-        if (!isset($page)) {
-            // リクエストパラメータより取得
-            $searchName = $request->name;
-            $searchEmail = $request->email;
+    /**
+     * ソート、ページング
+     * 
+     * @param Request $request
+     * @return view
+     */
+    public function paging(Request $request)
+    {
+        $page = $request->input('page', 0);
+        $searchSort = $request->input('sort', []);
 
-            // セッションに設定
-            $request->session()->put('USER_NAME', $searchName);
-            $request->session()->put('USER_EMAIL', $searchEmail);
-        } else {
-            // セッションより取得
-            $searchName = $request->session()->get('USER_NAME');
-            $searchEmail = $request->session()->get('USER_EMAIL');
-
-            // セッションに設定
-            $request->session()->put('USER_PAGE', $page);
+        if ($page) {
+            $request->session()->put("{$this->SESSION_KEY}.PAGE", $page);
+        }
+        if ($searchSort) {
+            $request->session()->put("{$this->SESSION_KEY}.SORT", $searchSort);
         }
 
-        // 並び順の設定値を取得
-        $st1 = $request->st1;
-        $st2 = $request->st2;
-        $st3 = $request->st3;
+        return $this->doSearch($request);
+    }
 
-        $query = User::getList();
+    /**
+     * 検索処理
+     * 
+     * @param Request $request
+     * @return view
+     */
+    protected function doSearch(Request $request)
+    {
+        // 検索条件取得
+        if ($request->session()->has($this->SESSION_KEY)) {
+            // セッションから復元
+            $searchName = $request->session()->get("{$this->SESSION_KEY}.NAME", '');
+            $searchEmail = $request->session()->get("{$this->SESSION_KEY}.EMAIL", '');
+            $searchSort = $request->session()->get("{$this->SESSION_KEY}.SORT", []);
+        } else {
+            // リスエストパラメータから取得
+            $searchName = $request->name;
+            $searchEmail = $request->email;
+            $searchSort = [];
+
+            $request->session()->put("{$this->SESSION_KEY}.NAME", $searchName);
+            $request->session()->put("{$this->SESSION_KEY}.EMAIL", $searchEmail);
+        }
+
+        $query = User::query();
 
         // 画面の検索条件を設定
         if ($searchName <> '') {
@@ -230,64 +247,32 @@ class UsersController extends Controller
         }
 
         // 並び順の設定
-        if (!empty($st1)) {
-            // ID
-            $users = $query->orderBy('id', $st1 === 'up' ? 'asc' : 'desc');
+        foreach ($this->SORT_TARGET as $target) {
+            if (array_key_exists($target, $searchSort)) {
+                $users = $query->orderBy($target, $searchSort[$target] === 'asc' ? 'asc' : 'desc');
+            }
         }
-        if (!empty($st2)) {
-            // 氏名
-            $users = $query->orderBy('name', $st2 === 'up' ? 'asc' : 'desc');
-        }
-        if (!empty($st3)) {
-            // メールアドレス
-            $users = $query->orderBy('email', $st3 === 'up' ? 'asc' : 'desc');
-        }
-
-        // 並び順指定がない場合の通常設定
+        // 第2ソート
         $users = $query->orderBy('id');
 
         // ページネーション
-        $users = $users->paginate(10);
-        $pagenateParams = [];
-        $pagenateParams['st1'] = $request->st1;
-        $pagenateParams['st2'] = $request->st2;
-        $pagenateParams['st3'] = $request->st3;
+        $users = $users->paginate(config('app.settings.page_limit'));
 
         // 各値を設定し、画面に返却
         return view('users', [
             'name'  => $searchName,
             'email' => $searchEmail,
-            'pagenateParams'  => $pagenateParams,
+            'sort'   => $searchSort,
             'users' => $users,
-            'st1'   => $st1,
-            'st2'   => $st2,
-            'st3'   => $st3,
         ]);
     }
 
     /**
-     * 画面オブジェクト初期化
+     * セッションクリア
      *
-     * @return string[]
+     * @param Request $request
      */
-    private function initPageObject()
-    {
-        return [
-            'name'  => '',
-            'email' => '',
-        ];
-    }
-
-    /**
-     * セッションを初期化
-     *
-     * @param [type] $request
-     * @return void
-     */
-    private function clearSession($request)
-    {
-        $request->session()->forget('USER_NAME');
-        $request->session()->forget('USER_EMAIL');
-        $request->session()->forget('USER_PAGE');
+    protected function clearSession($request) {
+        $request->session()->forget($this->SESSION_KEY);
     }
 }

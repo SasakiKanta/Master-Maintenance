@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UsersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,17 +20,20 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
-    Route::get('/home', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    // ホーム
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-    // 利用者マスタ検索(users)
+    // 利用者マスタ
     Route::prefix("users")->group(function () {
-        Route::get('', [App\Http\Controllers\UsersController::class, 'index'])->name('users.index');
-        Route::get('entry', [App\Http\Controllers\UsersController::class, 'entry'])->name('users.entry');
-        Route::get('{id}', [App\Http\Controllers\UsersController::class, 'edit'])->where('id', '[0-9]+')->name('users.edit');
-        Route::post('insert', [App\Http\Controllers\UsersController::class, 'insert'])->name('users.insert');
-        Route::post('update', [App\Http\Controllers\UsersController::class, 'update'])->name('users.update');
-        Route::post('delete', [App\Http\Controllers\UsersController::class, 'delete'])->name('users.delete');
-        Route::match(['get','post'], 'search', [App\Http\Controllers\UsersController::class, 'search'])->name('users.search');
+        Route::get('', [UsersController::class, 'index'])->name('users.index');
+        Route::get('clear', [UsersController::class, 'clear'])->name('users.clear');
+        Route::get('entry', [UsersController::class, 'entry'])->name('users.entry');
+        Route::get('{id}', [UsersController::class, 'edit'])->name('users.edit');
+        Route::put('{id?}', [UsersController::class, 'insert'])->name('users.insert');
+        Route::post('{id}', [UsersController::class, 'update'])->name('users.update');
+        Route::delete('{id}', [UsersController::class, 'delete'])->name('users.delete');
+        Route::post('search', [UsersController::class, 'search'])->name('users.search');
+        Route::get('search', [UsersController::class, 'paging'])->name('users.paging');
     });
 });
