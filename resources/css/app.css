@@ -60,6 +60,10 @@
     @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded;
 }
 
+.clear-btn {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-900 border-gray-500 font-bold py-3 px-8 rounded;
+}
+
 .update-btn {
     @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded;
 }
@@ -125,9 +129,11 @@ button.sort_button {
   
 button.sort_button_up::after {
     content: '　▲';
+    font-size: 0.7rem;
     /* float: right; */
 }
 button.sort_button_down::after {
     content: '　▼';
+    font-size: 0.7rem;
     /* float: right; */
 }
