@@ -23,11 +23,11 @@ class UserEntryRequest extends FormRequest
      */
     public function rules()
     {
-        $id = $this->get('id');
+        $id = $this->route('id');
         return [
             // バリデーションの設定
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', "unique:users,email,${id},id,is_deleted,0"],
+            'email' => ['required', 'string', 'email', 'max:255', "unique:users,email,${id},id,deleted_at,NULL"],
             'password' => ['required', 'string', 'min:8'],
         ];
     }
