@@ -239,11 +239,11 @@ class UsersController extends Controller
         // 画面の検索条件を設定
         if ($searchName <> '') {
             // 名前
-            $query->where('name', 'like binary', '%' . parent::escapeLikeQuery($searchName) . '%');
+            $query->where('name', 'like', '%' . parent::escapeLikeQuery($searchName) . '%');
         }
         if ($searchEmail <> '') {
             // email
-            $query->where('email', 'like binary', '%' . parent::escapeLikeQuery($searchEmail) . '%');
+            $query->where('email', 'like', '%' . parent::escapeLikeQuery($searchEmail) . '%');
         }
 
         // 並び順の設定
