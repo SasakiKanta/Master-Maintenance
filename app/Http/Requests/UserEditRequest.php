@@ -26,7 +26,7 @@ class UserEditRequest extends FormRequest
         $id = $this->route('id');
         return [
             // バリデーションの設定
-            'name' => ['string', 'max:255'],
+            'name' => ['string', 'max:100'],
             'email' => ['email', 'max:255', "unique:users,email,${id},id,deleted_at,NULL"],
             'password' => ['sometimes', 'nullable', 'min:8'],
         ];

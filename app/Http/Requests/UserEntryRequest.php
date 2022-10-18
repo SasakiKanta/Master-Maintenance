@@ -26,7 +26,7 @@ class UserEntryRequest extends FormRequest
         $id = $this->route('id');
         return [
             // バリデーションの設定
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', "unique:users,email,${id},id,deleted_at,NULL"],
             'password' => ['required', 'string', 'min:8'],
         ];
