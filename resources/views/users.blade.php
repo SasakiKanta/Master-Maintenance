@@ -29,17 +29,17 @@
         <div class="search-condition">
           <div>
             <label for="name" class="label">名前</label>
-            <input type="text" id="name" name="name" value="{{ $name }}" class="input-text">
+            <input type="text" id="name" name="name" value="{{ $name ?? '' }}" class="input-text">
           </div>
           <div>
             <label for="email" class="label">メールアドレス</label>
-            <input type="text" id="email" name="email" value="{{ $email }}" class="input-text">
+            <input type="text" id="email" name="email" value="{{ $email ?? '' }}" class="input-text">
           </div>
         </div>
 
         <div class="flex">
           <button type="submit" class="search-btn">検索</button>
-          <button type="button" class="clear-btn ml-4" onclick="location.href='{{ route('users.clear') }}';return false;">クリア</button>
+          <button type="button" class="clear-btn ml-4" onclick="location.href='{{ route('users') }}';return false;">クリア</button>
           <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('users.entry') }}';return false;">新規登録</button>
         </div>
       </form>

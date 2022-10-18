@@ -22,7 +22,21 @@ class UsersController extends Controller
     protected $SORT_TARGET = ['id', 'name', 'email'];
 
     /**
-     * 検索画面初期表示
+     * 初期化
+     *
+     * @param Request $request
+     * @return route
+     */
+    public function init(Request $request)
+    {
+        // セッション削除
+        $this->clearSession($request);
+        // indexへリダイレクト
+        return redirect()->route('users.index');
+    }
+
+    /**
+     * 検索画面表示
      *
      * @param Request $request
      * @return view
@@ -33,24 +47,7 @@ class UsersController extends Controller
             return $this->doSearch($request);
         }
 
-        return view('users', [
-            'name'  =>'',
-            'email' => '',
-        ]);
-    }
-
-    /**
-     * クリアボタン
-     *
-     * @param Request $request
-     * @return route
-     */
-    public function clear(Request $request)
-    {
-        // セッション削除
-        $this->clearSession($request);
-        // indexへリダイレクト
-        return redirect()->route('users.index');
+        return view('users');
     }
 
     /**
@@ -170,7 +167,7 @@ class UsersController extends Controller
         // メッセージの作成(messages.phpより本文を取得)
         $completeMessage = trans('messages.delete.complete');
 
-        // 各データ設定後、編集画面にリダイレクト
+        // 各データ設定後、一覧画面にリダイレクト
         return redirect()->route('users.index')
             ->with('flash_message', $completeMessage);
     }
@@ -197,14 +194,13 @@ class UsersController extends Controller
      */
     public function paging(Request $request)
     {
-        $page = $request->input('page', 0);
-        $searchSort = $request->input('sort', []);
-
-        if ($page) {
-            $request->session()->put("{$this->SESSION_KEY}.PAGE", $page);
-        }
-        if ($searchSort) {
-            $request->session()->put("{$this->SESSION_KEY}.SORT", $searchSort);
+        if ($request->has('sort')) {
+            // ソートパラメータがある場合
+            $request->session()->put("{$this->SESSION_KEY}.SORT", $request->sort);
+            $request->session()->put("{$this->SESSION_KEY}.PAGE", '');
+        } elseif ($request->has('page')) {
+            // ページパラメータがある場合
+            $request->session()->put("{$this->SESSION_KEY}.PAGE", $request->page);
         }
 
         return $this->doSearch($request);
@@ -221,48 +217,51 @@ class UsersController extends Controller
         // 検索条件取得
         if ($request->session()->has($this->SESSION_KEY)) {
             // セッションから復元
-            $searchName = $request->session()->get("{$this->SESSION_KEY}.NAME", '');
-            $searchEmail = $request->session()->get("{$this->SESSION_KEY}.EMAIL", '');
-            $searchSort = $request->session()->get("{$this->SESSION_KEY}.SORT", []);
+            $name = $request->session()->get("{$this->SESSION_KEY}.NAME", '');
+            $email = $request->session()->get("{$this->SESSION_KEY}.EMAIL", '');
+            $sort = $request->session()->get("{$this->SESSION_KEY}.SORT", []);
+            $page = $request->session()->get("{$this->SESSION_KEY}.PAGE", 0);
         } else {
             // リスエストパラメータから取得
-            $searchName = $request->name;
-            $searchEmail = $request->email;
-            $searchSort = [];
+            $name = $request->name;
+            $email = $request->email;
+            $sort = [];
+            $page = 0;
 
-            $request->session()->put("{$this->SESSION_KEY}.NAME", $searchName);
-            $request->session()->put("{$this->SESSION_KEY}.EMAIL", $searchEmail);
+            $request->session()->put("{$this->SESSION_KEY}.NAME", $name);
+            $request->session()->put("{$this->SESSION_KEY}.EMAIL", $email);
         }
 
         $query = User::query();
 
         // 画面の検索条件を設定
-        if ($searchName <> '') {
+        if ($name <> '') {
             // 名前
-            $query->where('name', 'like', '%' . parent::escapeLikeQuery($searchName) . '%');
+            $query->where('name', 'like', '%' . parent::escapeLikeQuery($name) . '%');
         }
-        if ($searchEmail <> '') {
+        if ($email <> '') {
             // email
-            $query->where('email', 'like', '%' . parent::escapeLikeQuery($searchEmail) . '%');
+            $query->where('email', 'like', '%' . parent::escapeLikeQuery($email) . '%');
         }
 
         // 並び順の設定
         foreach ($this->SORT_TARGET as $target) {
-            if (array_key_exists($target, $searchSort)) {
-                $users = $query->orderBy($target, $searchSort[$target] === 'asc' ? 'asc' : 'desc');
+            if (array_key_exists($target, $sort)) {
+                $users = $query->orderBy($target, $sort[$target] === 'asc' ? 'asc' : 'desc');
             }
         }
         // 第2ソート
         $users = $query->orderBy('id');
 
         // ページネーション
-        $users = $users->paginate(config('app.settings.page_limit'));
+        $pageLimit = config('app.settings.page_limit');
+        $users = $users->paginate($pageLimit, ['*'], 'page', $page);
 
         // 各値を設定し、画面に返却
         return view('users', [
-            'name'  => $searchName,
-            'email' => $searchEmail,
-            'sort'   => $searchSort,
+            'name'  => $name,
+            'email' => $email,
+            'sort'   => $sort,
             'users' => $users,
         ]);
     }

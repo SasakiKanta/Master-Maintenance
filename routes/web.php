@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,13 +22,13 @@ Auth::routes();
 Route::middleware(['auth'])->group(function () {
 
     // ホーム
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/', [HomeController::class, 'index']);
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     // 利用者マスタ
     Route::prefix("users")->group(function () {
         Route::get('', [UsersController::class, 'index'])->name('users.index');
-        Route::get('clear', [UsersController::class, 'clear'])->name('users.clear');
+        Route::get('init', [UsersController::class, 'init'])->name('users');
         Route::get('entry', [UsersController::class, 'entry'])->name('users.entry');
         Route::get('{id}', [UsersController::class, 'edit'])->name('users.edit');
         Route::put('{id?}', [UsersController::class, 'insert'])->name('users.insert');
@@ -36,4 +37,5 @@ Route::middleware(['auth'])->group(function () {
         Route::post('search', [UsersController::class, 'search'])->name('users.search');
         Route::get('search', [UsersController::class, 'paging'])->name('users.paging');
     });
+
 });
