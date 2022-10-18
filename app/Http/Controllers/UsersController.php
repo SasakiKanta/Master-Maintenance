@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Enums\Flag;
@@ -43,7 +43,8 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->session()->has($this->SESSION_KEY)) {
+        // Facase記法 に変更してます（$request->session()->has）
+        if (Session::has($this->SESSION_KEY)) {
             return $this->doSearch($request);
         }
 
@@ -196,11 +197,11 @@ class UsersController extends Controller
     {
         if ($request->has('sort')) {
             // ソートパラメータがある場合
-            $request->session()->put("{$this->SESSION_KEY}.SORT", $request->sort);
-            $request->session()->put("{$this->SESSION_KEY}.PAGE", '');
+            Session::put("{$this->SESSION_KEY}.SORT", $request->sort);
+            Session::put("{$this->SESSION_KEY}.PAGE", '');
         } elseif ($request->has('page')) {
             // ページパラメータがある場合
-            $request->session()->put("{$this->SESSION_KEY}.PAGE", $request->page);
+            Session::put("{$this->SESSION_KEY}.PAGE", $request->page);
         }
 
         return $this->doSearch($request);
@@ -215,12 +216,12 @@ class UsersController extends Controller
     protected function doSearch(Request $request)
     {
         // 検索条件取得
-        if ($request->session()->has($this->SESSION_KEY)) {
+        if (Session::has($this->SESSION_KEY)) {
             // セッションから復元
-            $name = $request->session()->get("{$this->SESSION_KEY}.NAME", '');
-            $email = $request->session()->get("{$this->SESSION_KEY}.EMAIL", '');
-            $sort = $request->session()->get("{$this->SESSION_KEY}.SORT", []);
-            $page = $request->session()->get("{$this->SESSION_KEY}.PAGE", 0);
+            $name = Session::get("{$this->SESSION_KEY}.NAME", '');
+            $email = Session::get("{$this->SESSION_KEY}.EMAIL", '');
+            $sort = Session::get("{$this->SESSION_KEY}.SORT", []);
+            $page = Session::get("{$this->SESSION_KEY}.PAGE", 0);
         } else {
             // リスエストパラメータから取得
             $name = $request->name;
@@ -228,8 +229,8 @@ class UsersController extends Controller
             $sort = [];
             $page = 0;
 
-            $request->session()->put("{$this->SESSION_KEY}.NAME", $name);
-            $request->session()->put("{$this->SESSION_KEY}.EMAIL", $email);
+            Session::put("{$this->SESSION_KEY}.NAME", $name);
+            Session::put("{$this->SESSION_KEY}.EMAIL", $email);
         }
 
         $query = User::query();
@@ -272,6 +273,6 @@ class UsersController extends Controller
      * @param Request $request
      */
     protected function clearSession($request) {
-        $request->session()->forget($this->SESSION_KEY);
+        Session::forget($this->SESSION_KEY);
     }
 }
