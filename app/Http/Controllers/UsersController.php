@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use App\Enums\Flag;
 use App\Http\Requests\UserEntryRequest;
 use App\Http\Requests\UserEditRequest;
