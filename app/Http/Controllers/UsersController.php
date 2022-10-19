@@ -43,7 +43,7 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        // Facase記法 に変更してます（$request->session()->has）
+        // Facade記法 に変更してます（$request->session()->has）
         if (Session::has($this->SESSION_KEY)) {
             return $this->doSearch($request);
         }
