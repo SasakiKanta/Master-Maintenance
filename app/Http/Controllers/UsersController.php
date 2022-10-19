@@ -256,7 +256,7 @@ class UsersController extends Controller
 
         // ページネーション
         $pageLimit = config('app.settings.page_limit');
-        $users = $users->paginate($pageLimit, ['*'], 'page', $page);
+        $users = $users->paginate($pageLimit, ['*'], 'page', $page)->withPath('/users/search');
 
         // 各値を設定し、画面に返却
         return view('users', [

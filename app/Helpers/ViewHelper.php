@@ -16,7 +16,7 @@ class ViewHelper
           $orderClass = ($sorts[$name] == 'desc')? 'sort_button_down': 'sort_button_up';
         }
 
-        $tag = "<button name='sort[$name]' class='sort_button $orderClass') sort_button_down @endif' value='$order'}>$label</button>";
+        $tag = "<button name='sort[$name]' class='sort_button $orderClass' value='$order'>$label</button>";
         return $tag;
     }
 }

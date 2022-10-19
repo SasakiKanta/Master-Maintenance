@@ -63,9 +63,9 @@
             <tbody class="list-table-body">
             <?php foreach ($users as $user) { ?>
               <tr class="list-table-body-tr">
-                <td class="py-2 px-4 text-center">{{$user->id}}</td>
-                <td class="py-2 px-4"><a href="/users/{{$user->id}}">{{$user->name}}</a></td>
-                <td class="py-2 px-4">{{ $user->email}}</td>
+                <td class="py-2 px-4 text-center">{{ $user->id }}</td>
+                <td class="py-2 px-4"><a href="/users/{{$user->id}}">{{ $user->name }}</a></td>
+                <td class="py-2 px-4">{{ $user->email }}</td>
                 <td class="py-2 px-4 text-center">
                   @if ($user->is_locked)
                   <span class="badge-yellow">ロック</span>
