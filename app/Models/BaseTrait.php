@@ -22,6 +22,7 @@ trait BaseTrait {
          */
         static::creating(function ($model) {
             if (Auth::user() != null) {
+                $model->created_by = Auth::user()->id;
                 $model->updated_by = Auth::user()->id;
             }
         });
