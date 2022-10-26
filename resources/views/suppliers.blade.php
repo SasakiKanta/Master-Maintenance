@@ -6,7 +6,7 @@
     <!-- パンくず -->
     <?php
       $bc = array();
-      array_push($bc, ['得意先', '']);
+      array_push($bc, ['取引先', '']);
     ?>
     {!! BreadcrumbHelper::tag($bc) !!}
 
