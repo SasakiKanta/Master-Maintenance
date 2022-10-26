@@ -6,7 +6,7 @@
     <!-- パンくず -->
     <?php
       $bc = array();
-      array_push($bc, ['顧客', route('users.index')]);
+      array_push($bc, ['顧客', route('customers.index')]);
       array_push($bc, ['顧客編集', '']);
     ?>
     {!! BreadcrumbHelper::tag($bc) !!}
@@ -38,7 +38,7 @@
       @endif 
 
       <!-- 入力フォーム -->
-      <form id="edit-form" class="form-tag" method="POST" action="{{ route('users.update', $id) }}">
+      <form id="edit-form" class="form-tag" method="POST" action="{{ route('customers.update', $id) }}">
         @csrf
         <input type="hidden" id="form-method" name="_method" value="{{ $id? 'POST': 'PUT'; }}">
 
@@ -179,17 +179,6 @@
           <label for="last_name" class="label">管理側メモ</label>
           <textarea id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
         </div>
-
-        <div class="flex items-start mb-6">
-          <div class="flex items-center h-5">
-            <input type="checkbox" id="is-locked" name="isLocked" value="1" class="check-box"
-            @if ($isLocked)
-              checked
-            @endif
-            >
-          </div>
-          <label for="is-locked" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">アカウントロック</label>
-        </div>
         <div class="flex">
           <!-- 登録・更新ボタン -->
           <button type="submit" class="update-btn">
@@ -214,7 +203,7 @@
   function doAction() {
     if (confirm('削除します。よろしいですか？')) {
       let form = document.getElementById('edit-form');
-      form.action = "{{ route('users.delete', $id) }}";
+      form.action = "{{ route('customers.delete', $id) }}";
       document.getElementById('form-method').value = 'DELETE';
       form.submit();
     }

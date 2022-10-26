@@ -6,17 +6,17 @@
     <!-- パンくず -->
     <?php
       $bc = array();
-      array_push($bc, ['得意先', route('users.index')]);
-      array_push($bc, ['得意先編集', '']);
+      array_push($bc, ['取引先', route('suppliers.index')]);
+      array_push($bc, ['取引先編集', '']);
     ?>
     {!! BreadcrumbHelper::tag($bc) !!}
 
     <section class="section">
       <header class="section-header">
       @if ($id)
-        得意先更新
+        取引先更新
       @else
-        得意先登録
+        取引先登録
       @endif
       </header>
 
@@ -38,32 +38,33 @@
       @endif 
 
       <!-- 入力フォーム -->
-      <form id="edit-form" class="form-tag" method="POST" action="{{ route('users.update', $id) }}">
+      <form id="edit-form" class="form-tag" method="POST" action="{{ route('suppliers.update', $id) }}">
         @csrf
         <input type="hidden" id="form-method" name="_method" value="{{ $id? 'POST': 'PUT'; }}">
 
         <div>
           <label for="first_name" class="label">取引先コード<span class="require-label"></span></label>
-          <input type="text" id="name" name="name" value="{{old('name', $name)}}"
-            class="@error('name') error-text @enderror input-text" placeholder="">
-          @error('name')
+          <input type="text" id="code" name="code" value="{{old('code', $code)}}"
+            class="@error('code') error-text @enderror input-text" placeholder="">
+          @error('code')
           <p class="valid-msg">{{ $message }}</p>
           @enderror
         </div>
         <div>
           <label for="last_name" class="label">取引先名<span class="require-label"></span></label>
-          <input type="text" id="email" name="email" value="{{old('email', $email)}}" 
-            class="@error('email') error-text @enderror input-text" placeholder="">
-          @error('email')
+          <input type="text" id="name" name="name" value="{{old('name', $name)}}" 
+            class="@error('name') error-text @enderror input-text" placeholder="">
+          @error('name')
             <p class="valid-msg">{{ $message }}</p>
           @enderror
         </div>
         <div>
           <label for="last_name" class="label">取引先区分<span class="require-label"></span></label>
-          <select id="supplyKbn" class="w-max pr-8 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          <select id="supplyKbn" name='supplier_type' class="w-max pr-8 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             <option selected value="">選択してください</option>
-            <option value="1">得意先</option>
-            <option value="2">仕入先</option>
+            <?php foreach (\App\Enums\SupplierType::cases() as $case) { ?>
+              <option value="{{ $case->value }}" @if(($supplier_type ?? '') === $case->value) selected @endif>{{ $case->label() }}</option>
+            <?php } ?>
           </select>
         </div>
         <div class="flex">
@@ -90,7 +91,7 @@
   function doAction() {
     if (confirm('削除します。よろしいですか？')) {
       let form = document.getElementById('edit-form');
-      form.action = "{{ route('users.delete', $id) }}";
+      form.action = "{{ route('suppliers.delete', $id) }}";
       document.getElementById('form-method').value = 'DELETE';
       form.submit();
     }

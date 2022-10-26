@@ -238,6 +238,7 @@ return [
 
         // Emuns
         'Flag' =>  App\Enums\Flag::class,
+        'SupplierType' =>  App\Enums\SupplierType::class,
     ],
 
     'settings' => [
