@@ -7,21 +7,19 @@ namespace App\Enums;
  *
  * @access public
  */
-final class Flag
+enum Flag: string
 {
-    const ON  = '1';
-    const OFF = '0';
+    case ON = '1';
+    case OFF = '0';
 
     /**
-     * Keyリストを返す。
-     *
-     * @return array
+     * 表示用のテキストを取得
      */
-    public static function keys(): array
+    public function label(): string
     {
-        return [
-            self::ON,
-            self::OFF
-        ];
+        return match($this) {
+            self::ON => 'ON',
+            self::OFF => 'OFF',
+        };
     }
 }

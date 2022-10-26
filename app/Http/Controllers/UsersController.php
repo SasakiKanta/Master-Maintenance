@@ -64,7 +64,7 @@ class UsersController extends Controller
             'id'  => 0,
             'name'  => '',
             'email' => '',
-            'isLocked' => Flag::OFF,
+            'isLocked' => Flag::OFF->value,
         ]);
     }
 

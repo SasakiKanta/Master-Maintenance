@@ -2,10 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use App\Enums\Flag;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -89,10 +86,10 @@ class User extends Authenticatable
         // アカウントロック
         if(isset($inputAll['isLocked'])) {
             // チェックボックスチェック時
-            $user->is_locked = Flag::ON;
+            $user->is_locked = Flag::ON->value;
         } else {
             // チェックボックス未チェック時
-            $user->is_locked = Flag::OFF;
+            $user->is_locked = Flag::OFF->value;
         }
 
         // 登録・更新項目の設定
