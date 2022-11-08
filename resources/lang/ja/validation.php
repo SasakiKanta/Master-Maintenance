@@ -18,10 +18,14 @@ return [
         'string'  => ':attributeは、:max文字以下で指定してください。',
     ],
     'string' => ':attributeは文字列を入力して下さい。',
+    'numeric' => ':attributeは数値列を入力して下さい。',
+    'digits' => ':attributeは:digits桁の数値列を入力してください',
     'email'  => 'メールアドレスの形式で入力してください。',
     'min'    => [
         'string'  => ':attributeは、:min文字以上で指定してください。',
     ],
+    'exists' => ':attributeの登録がありません。',
     'unique' => ':attributeは既に使用されています。',
     'required' => ':attributeは必ず指定してください。',
+    'enum' => ':attributeの登録がありません。',
 ];

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\UsersController;
 
@@ -36,6 +37,19 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('{id}', [SuppliersController::class, 'delete'])->name('suppliers.delete');
         Route::post('search', [SuppliersController::class, 'search'])->name('suppliers.search');
         Route::get('search', [SuppliersController::class, 'paging'])->name('suppliers.paging');
+    });
+
+    // 顧客マスタ
+    Route::prefix("customers")->group(function () {
+        Route::get('', [CustomersController::class, 'index'])->name('customers.index');
+        Route::get('init', [CustomersController::class, 'init'])->name('customers');
+        Route::get('entry', [CustomersController::class, 'entry'])->name('customers.entry');
+        Route::get('{id}', [CustomersController::class, 'edit'])->name('customers.edit');
+        Route::put('{id?}', [CustomersController::class, 'insert'])->name('customers.insert');
+        Route::post('{id}', [CustomersController::class, 'update'])->name('customers.update');
+        Route::delete('{id}', [CustomersController::class, 'delete'])->name('customers.delete');
+        Route::post('search', [CustomersController::class, 'search'])->name('customers.search');
+        Route::get('search', [CustomersController::class, 'paging'])->name('customers.paging');
     });
 
     // 利用者マスタ

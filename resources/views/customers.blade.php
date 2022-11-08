@@ -28,43 +28,41 @@
         @csrf
         <div class="search-condition">
           <div>
-            <label for="last_name" class="label">名前</label>
-            <input type="text" id="email" name="email" value="{{$email}}" class="input-text" placeholder="">
+            <label for="full_name" class="label">名前</label>
+            <input type="text" id="full_name" name="full_name" value="{{$full_name ?? '' }}" class="input-text" placeholder="">
           </div>
           <div>
-            <label for="first_name" class="label">名前(カナ)</label>
-            <input type="text" id="name" name="name" value="{{$name}}" class="input-text" placeholder="">
+            <label for="full_name_kana" class="label">名前(カナ)</label>
+            <input type="text" id="full_name_kana" name="full_name_kana" value="{{$full_name_kana ?? '' }}" class="input-text" placeholder="">
           </div>
           <div>
-            <label for="first_name" class="label">性別</label>
-            <input id="gender-1" type="radio" value="1" name="gender" class="radio_btn">
-            <label for="gender-1" class="radio_btn_label">男</label>
-            <input id="gender-2" type="radio" value="2" name="gender" class="radio_btn">
-            <label for="gender-2" class="radio_btn_label">女</label>
-            <input id="gender-3" type="radio" value="3" name="gender" class="radio_btn">
-            <label for="gender-3" class="radio_btn_label">指定しない</label>
+            <label for="gender" class="label">性別</label>
+            <?php foreach (\App\Enums\Gender::cases() as $case) { ?>
+              <input id={{'gender-' . $case->value}} type="radio" name="gender" class="radio_btn" value="{{ $case->value }}" @if(($gender ?? '') === $case->value) checked @endif></input>
+              <label for={{'gender-' . $case->value}} class="radio_btn_label">{{ $case->label() }}</label>
+            <?php } ?>
           </div>
           <div>
-            <label for="last_name" class="label">住所</label>
-            <input type="text" id="email" name="email" value="{{$email}}" class="input-text" placeholder="">
+            <label for="addr" class="label">住所</label>
+            <input type="text" id="addr" name="addr" value="{{$addr ?? '' }}" class="input-text" placeholder="">
           </div>
           <div>
-            <label for="last_name" class="label">電話番号</label>
-            <input type="text" id="email" name="email" value="{{$email}}" class="input-text" placeholder="">
+            <label for="tel" class="label">電話番号</label>
+            <input type="text" id="tel" name="tel" value="{{$tel ?? '' }}" class="input-text" placeholder="">
           </div>
           <div>
-            <label for="last_name" class="label">メールアドレス</label>
-            <input type="text" id="email" name="email" value="{{$email}}" class="input-text" placeholder="">
+            <label for="email" class="label">メールアドレス</label>
+            <input type="text" id="email" name="email" value="{{$email ?? '' }}" class="input-text" placeholder="">
           </div>
           <div>
-            <label for="last_name" class="label">取引先名</label>
-            <input type="text" id="email" name="email" value="{{$email}}" class="input-text" placeholder="">
+            <label for="supplier_name" class="label">取引先名</label>
+            <input type="text" id="supplier_name" name="supplier_name" value="{{$supplier_name ?? '' }}" class="input-text" placeholder="">
           </div>
         </div>
 
         <div class="flex">
           <button type="submit"class="search-btn" >検索</button>
-          <button type="button" class="clear-btn ml-4" onclick="location.href='{{ route('customers.clear') }}';return false;">クリア</button>
+          <button type="button" class="clear-btn ml-4" onclick="location.href='{{ route('customers') }}';return false;">クリア</button>
           <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('customers.entry') }}';return false;">新規登録</button>
         </div>
       </form>
@@ -77,11 +75,11 @@
             <thead class="list-table-head">
               <tr class="list-table-head-tr">
                 <th scope="col" class="py-2">{!! V::sortButton('id', 'ID', $sort) !!}</th>
-                <th scope="col" class="py-2">{!! V::sortButton('name', '名前', $sort) !!}</th>
-                <th scope="col" class="py-2">{!! V::sortButton('name', '性別', $sort) !!}</th>
-                <th scope="col" class="py-2">{!! V::sortButton('name', '住所', $sort) !!}</th>
+                <th scope="col" class="py-2">{!! V::sortButton('full_name', '名前', $sort) !!}</th>
+                <th scope="col" class="py-2">{!! V::sortButton('gender', '性別', $sort) !!}</th>
+                <th scope="col" class="py-2">{!! V::sortButton('addr', '住所', $sort) !!}</th>
                 <th scope="col" class="py-2">{!! V::sortButton('email', 'メールアドレス', $sort) !!}</th>
-                <th scope="col" class="py-2">{!! V::sortButton('email', '取引先名', $sort) !!}</th>
+                <th scope="col" class="py-2">{!! V::sortButton('supplier_name', '取引先名', $sort) !!}</th>
                 <th>&nbsp;</th>
               </tr>
             </thead>
@@ -90,11 +88,11 @@
             <?php foreach ($customers as $customer) { ?>
               <tr class="list-table-body-tr">
                 <td class="py-2 px-4 text-center">{{$customer->id}}</td>
-                <td class="py-2 px-4"><a href="/customers/{{$customer->id}}">{{$customer->name}}</a></td>
-                <td class="py-2 px-4">男</td>
-                <td class="py-2 px-4">沖縄県沖縄市住所ABCDEFGH</td>
+                <td class="py-2 px-4"><a href="/customers/{{$customer->id}}">{{$customer->full_name}}</a></td>
+                <td class="py-2 px-4 text-center">{{ $customer->genderLabel}}</td>
+                <td class="py-2 px-4">{{ $customer->addr}}</td>
                 <td class="py-2 px-4">{{ $customer->email}}</td>
-                <td class="py-2 px-4">取引先A</td>
+                <td class="py-2 px-4">{{ $customer->name}}</td>
                 <td class="text-center">
                   <button type="button" class="edit-btn" onclick='location.href="/customers/{{$customer->id}}";return false;'>更新</button>
                 </td>
