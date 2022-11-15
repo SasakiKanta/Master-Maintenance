@@ -32,13 +32,13 @@
             <input type="text" id="full_name" name="full_name" value="{{$full_name ?? '' }}" class="input-text" placeholder="">
           </div>
           <div>
-            <label for="full_name_kana" class="label">名前(カナ)</label>
+            <label for="full_name_kana" class="label">名前（フリガナ）</label>
             <input type="text" id="full_name_kana" name="full_name_kana" value="{{$full_name_kana ?? '' }}" class="input-text" placeholder="">
           </div>
           <div>
             <label for="gender" class="label">性別</label>
             <?php foreach (\App\Enums\Gender::cases() as $case) { ?>
-              <input id={{'gender-' . $case->value}} type="radio" name="gender" class="radio_btn" value="{{ $case->value }}" @if(($gender ?? '') === $case->value) checked @endif></input>
+              <input id={{'gender-' . $case->value}} type="radio" name="gender" class="radio_btn" value="{{ $case->value }}" @if(($gender ?? '') === $case->value) checked @endif>
               <label for={{'gender-' . $case->value}} class="radio_btn_label">{{ $case->label() }}</label>
             <?php } ?>
           </div>
