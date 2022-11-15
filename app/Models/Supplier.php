@@ -51,15 +51,15 @@ class Supplier extends Model
      */
     public static function upsertData($id, $inputAll) {
 
-        $user = Supplier::firstOrNew(['id' => $id]);
+        $supplier = Supplier::firstOrNew(['id' => $id]);
 
         // 値が設定されている場合のみ、登録・更新として設定
-        $user->fill($inputAll);
+        $supplier->fill($inputAll);
 
         // 登録・更新項目の設定
-        $user->save();
+        $supplier->save();
 
-        return $user;
+        return $supplier;
     }
 
 }

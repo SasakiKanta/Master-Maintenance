@@ -45,7 +45,7 @@
         <div>
           <label for="first_name" class="label">取引先コード<span class="require-label"></span></label>
           <input type="text" id="code" name="code" value="{{old('code', $code)}}"
-            class="@error('code') error-text @enderror input-text" placeholder="">
+            class="@error('code') error-text @enderror input-text" @if($id) readonly @endif >
           @error('code')
           <p class="valid-msg">{{ $message }}</p>
           @enderror
@@ -53,7 +53,7 @@
         <div>
           <label for="last_name" class="label">取引先名<span class="require-label"></span></label>
           <input type="text" id="name" name="name" value="{{old('name', $name)}}" 
-            class="@error('name') error-text @enderror input-text" placeholder="">
+            class="@error('name') error-text @enderror input-text">
           @error('name')
             <p class="valid-msg">{{ $message }}</p>
           @enderror
@@ -63,7 +63,7 @@
           <select id="supplyKbn" name='supplier_type' class="w-max pr-8 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             <option selected value="">選択してください</option>
             <?php foreach (\App\Enums\SupplierType::cases() as $case) { ?>
-              <option value="{{ $case->value }}" @if(($supplier_type ?? '') === $case->value) selected @endif>{{ $case->label() }}</option>
+              <option value="{{ $case->value }}" @if(old('supplier_type', $supplier_type) === $case->value) selected @endif>{{ $case->label() }}</option>
             <?php } ?>
           </select>
         </div>
