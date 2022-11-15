@@ -36,19 +36,17 @@
             <input type="text" id="full_name_kana" name="full_name_kana" value="{{$full_name_kana ?? '' }}" class="input-text" placeholder="">
           </div>
           <div>
-            <label for="gender" class="label">性別</label>
+            <label class="label">性別</label>
             <?php foreach (\App\Enums\Gender::cases() as $case) { ?>
-              <input id={{'gender-' . $case->value}} type="radio" name="gender" class="radio_btn" value="{{ $case->value }}" @if(($gender ?? '') === $case->value) checked @endif>
-              <label for={{'gender-' . $case->value}} class="radio_btn_label">{{ $case->label() }}</label>
+              <label class="radio_btn_label">
+                <input type="radio" name="gender" class="radio_btn" value="{{ $case->value }}" @if(($gender ?? '') === $case->value) checked @endif>
+                {{ $case->label() }}
+              </label>
             <?php } ?>
           </div>
           <div>
             <label for="addr" class="label">住所</label>
             <input type="text" id="addr" name="addr" value="{{$addr ?? '' }}" class="input-text" placeholder="">
-          </div>
-          <div>
-            <label for="tel" class="label">電話番号</label>
-            <input type="text" id="tel" name="tel" value="{{$tel ?? '' }}" class="input-text" placeholder="">
           </div>
           <div>
             <label for="email" class="label">メールアドレス</label>
