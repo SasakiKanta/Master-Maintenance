@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\SupplierType;
+use App\Rules\SupplierCodeRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class SupplierEntryRequest extends FormRequest
 {
@@ -26,9 +29,9 @@ class SupplierEntryRequest extends FormRequest
         $id = $this->route('id');
         return [
             // バリデーションの設定
+            'code' => ['required', 'string', 'max:10', "unique:suppliers,code,${id},id,deleted_at,NULL", new SupplierCodeRule($this->request)],
             'name' => ['required', 'string', 'max:50'],
-            'code' => ['required', 'string', 'max:10'],
-            'supplier_type' => ['required', 'string', 'max:1'],
+            'supplier_type' => ['required', 'string', new Enum(SupplierType::class)],
         ];
     }
 
@@ -58,4 +61,31 @@ class SupplierEntryRequest extends FormRequest
             'supplier_type' => '取引先区分',
         ];
     }
+
+    /**
+     *  このメソッドを追記
+     * @param $validator
+     */
+    // public function withValidator($validator)
+    // {
+    //     // バリデーション完了後
+    //     $validator->after(function ($validator) {   
+
+    //         // 取引先区分に対応するEnumを取得
+    //         $e = SupplierType::tryFrom($this->supplier_type);
+    //         if (!$e) {
+    //             // 取引先区分が空、もしくは該当がない場合はチェックしない
+    //             return;
+    //         }
+
+    //         $prefix = $e->prefix();
+    //         $label = $e->label();
+
+    //         // 指定のコードで始まっているかチェック
+    //         $ret = str_starts_with($this->code, $prefix);
+    //         if (!$ret) {
+    //             $validator->errors()->add('code', "取引先区分が{$label}の場合、取引先コードは「{$prefix}」始まりのみ可能です。");
+    //         }            
+    //     });
+    // }
 }

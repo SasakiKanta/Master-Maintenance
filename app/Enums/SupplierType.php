@@ -20,4 +20,15 @@ enum SupplierType: string
             self::SUPPLIER => '仕入先',
         };
     }
+
+    /**
+     * 取引先コード用Prefix
+     */
+    public function prefix(): string
+    {
+        return match($this) {
+            self::CUSTOMER => '1',
+            self::SUPPLIER => '2',
+        };
+    }
 }

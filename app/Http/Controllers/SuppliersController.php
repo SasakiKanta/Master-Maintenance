@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use App\Enums\Flag;
 use App\Http\Requests\SupplierEntryRequest;
 use App\Http\Requests\SupplierEditRequest;
 use App\Models\Supplier;
@@ -19,7 +18,7 @@ class SuppliersController extends Controller
     protected $SESSION_KEY = 'SUPPLIERS';
 
     /** ソートカラム */
-    protected $SORT_TARGET = ['id', 'code', 'name'];
+    protected $SORT_TARGET = ['id', 'code', 'name', 'supplier_type'];
 
     /**
      * 初期化
@@ -101,15 +100,15 @@ class SuppliersController extends Controller
         $inputAll = $request->all();
 
         // 登録内部処理
-        $user = $this->upsert($id, $inputAll);
-        $userId = $user->id;
+        $supplier = $this->upsert($id, $inputAll);
+        $id = $supplier->id;
 
         // メッセージの作成(messages.phpより本文を取得)
         $completeMessage = trans('messages.regist.complete');
 
         // 各データ設定後、編集画面にリダイレクト
         return redirect()->route('suppliers.edit', [
-            'id' => $userId,
+            'id' => $id,
         ])->with('flash_message', $completeMessage);
     }
 
@@ -148,8 +147,8 @@ class SuppliersController extends Controller
     {
         return DB::transaction(function () use ($id, $inputAll) {
             // データの登録・更新
-            $user = Supplier::upsertData($id, $inputAll);
-            return $user;
+            $supplier = Supplier::upsertData($id, $inputAll);
+            return $supplier;
         });
     }
 
