@@ -77,7 +77,7 @@
                 <th scope="col" class="py-2">{!! V::sortButton('gender', '性別', $sort) !!}</th>
                 <th scope="col" class="py-2">{!! V::sortButton('addr', '住所', $sort) !!}</th>
                 <th scope="col" class="py-2">{!! V::sortButton('email', 'メールアドレス', $sort) !!}</th>
-                <th scope="col" class="py-2">{!! V::sortButton('supplier_name', '取引先名', $sort) !!}</th>
+                <th scope="col" class="py-2">{!! V::sortButton('suppliers.name', '取引先名', $sort) !!}</th>
                 <th>&nbsp;</th>
               </tr>
             </thead>
@@ -85,12 +85,12 @@
             <tbody class="list-table-body">
             <?php foreach ($customers as $customer) { ?>
               <tr class="list-table-body-tr">
-                <td class="py-2 px-4 text-center">{{$customer->id}}</td>
-                <td class="py-2 px-4"><a href="/customers/{{$customer->id}}">{{$customer->full_name}}</a></td>
-                <td class="py-2 px-4 text-center">{{ $customer->genderLabel}}</td>
-                <td class="py-2 px-4">{{ $customer->addr}}</td>
-                <td class="py-2 px-4">{{ $customer->email}}</td>
-                <td class="py-2 px-4">{{ $customer->name}}</td>
+                <td class="py-2 px-4 text-center">{{ $customer->id }}</td>
+                <td class="py-2 px-4"><a href="/customers/{{$customer->id}}">{{ $customer->full_name }}</a></td>
+                <td class="py-2 px-4 text-center">{{ $customer->genderLabel }}</td>
+                <td class="py-2 px-4">{{ $customer->addr }}</td>
+                <td class="py-2 px-4">{{ $customer->email }}</td>
+                <td class="py-2 px-4">{{ $customer->name }}</td>
                 <td class="text-center">
                   <button type="button" class="edit-btn" onclick='location.href="/customers/{{$customer->id}}";return false;'>更新</button>
                 </td>

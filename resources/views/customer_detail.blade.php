@@ -82,8 +82,9 @@
           <div class="w-1/3">
             <label for="gender" class="label">性別</label>
             <?php foreach (\App\Enums\Gender::cases() as $case) { ?>
-              <input id={{'gender-' . $case->value}} type="radio" name="gender" class="radio_btn" value="{{ $case->value }}" @if(($gender ?? '') === $case->value) checked @endif></input>
-              <label for={{'gender-' . $case->value}} class="radio_btn_label">{{ $case->label() }}</label>
+              <label>
+              <input type="radio" name="gender" class="radio_btn" value="{{ $case->value }}" @if(($gender ?? '') === $case->value) checked @endif>
+              {{ $case->label() }}</label>
             <?php } ?>
             @error('gender')
             <p class="valid-msg">{{ $message }}</p>

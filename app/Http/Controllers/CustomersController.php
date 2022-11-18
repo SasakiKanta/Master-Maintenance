@@ -19,7 +19,7 @@ class CustomersController extends Controller
     protected $SESSION_KEY = 'CUSTOMERS';
 
     /** ソートカラム */
-    protected $SORT_TARGET = ['id', 'full_name', 'gender', 'addr', 'email'];
+    protected $SORT_TARGET = ['id', 'full_name', 'gender', 'addr', 'email', 'suppliers.name'];
 
     /**
      * 初期化
@@ -302,9 +302,14 @@ class CustomersController extends Controller
 
         $query = Customer::query();
         
-        // 取引先テーブルと内部結合
-        $query->leftjoin('suppliers', 'suppliers.id', '=', 'supplier_id')
-            ->select('customers.id', 'customers.full_name', 'customers.gender', 'customers.addr', 'customers.email', 'suppliers.name');
+        // 取得対象カラム
+        $query->select('customers.id', 'customers.full_name', 'customers.gender', 'customers.addr', 'customers.email', 'suppliers.name');
+
+        // 取引先テーブルと外部結合
+        $query->leftjoin('suppliers', function ($query) {
+            $query->on('customers.supplier_id', '=', 'suppliers.id')
+                    ->whereNull('suppliers.deleted_at');
+        });
 
         // 画面の検索条件を設定
         if ($full_name <> '') {
@@ -322,10 +327,6 @@ class CustomersController extends Controller
         if ($addr <> '') {
             // 顧客住所
             $query->where('customers.addr', 'like', '%' . parent::escapeLikeQuery($addr) . '%');
-        }
-        if ($tel <> '') {
-            // 顧客電話番号
-            $query->where('customers.tel', 'like', '%' . parent::escapeLikeQuery($tel) . '%');
         }
         if ($email <> '') {
             // 顧客e-mail
