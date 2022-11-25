@@ -2,60 +2,70 @@
 
 namespace App\Rules;
 
-use App\Enums\SupplierType;
 use Illuminate\Contracts\Validation\Rule;
 
-/**
- * 取引先コードの独自バリデーション
- */
 class SupplierCodeRule implements Rule
 {
+    protected $supplierType;
+
     /**
-     * コンストラクタ―
+     * Create a new rule instance.
      *
-     * @param object $requests リクエストパラメータ
+     * @return void
      */
-    public function __construct($requests)
+    public function __construct($reqest)
     {
-        $this->inputs = $requests->all();
+        //リクエストパラーメータから情報を取得
+        $this->supplierType = $reqest->all();
+
+        //supplier_typeのみを代入
+        $this->supplierType = $this->supplierType['supplier_type'];
     }
 
     /**
-     * バリデーション
-     * 
-     * 取引先区分が[得意先]の場合、取引先コードは先頭1始まりのみ可能。
-     * 取引先区分が[仕入先]の場合、取引先コードは先頭2始まりのみ可能。
+     * Determine if the validation rule passes.
      *
-     * @param string $attribute 属性
-     * @param string $value 入力値
-     * @return boolean 正常：true、以上：false
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
      */
     public function passes($attribute, $value)
     {
-        // 取引先区分を取得
-        $supplierType = $this->inputs['supplier_type'];
+        //取引先区分が得意先の場合、先頭が１、取引先の場合は先頭が2
+        if($this->supplierType == 1){
 
-        // 取引先区分に対応するEnumを取得
-        $e = SupplierType::tryFrom($supplierType);
-        if (!$e) {
-            // 取引先区分が空、もしくは該当がない場合はチェックしない
+            //return preg_match('/^1/', $value);
+
+            $prefix = '1';
+
+        }elseif($this->supplierType == 2){
+
+            //return preg_match('/^2/', $value);
+
+            $prefix = '2';
+
+        }else{
             return true;
         }
-
-        $this->label = $e->label();
-        $this->prefix = $e->prefix();
-
-        // 指定のコードで始まっているかチェック
-        return str_starts_with($value, $this->prefix);
+        $ret = str_starts_with($value, $prefix);
+        return $ret;
     }
 
     /**
-     * メッセージを返す
+     * Get the validation error message.
      *
-     * @return string エラーメッセージ
+     * @return string
      */
     public function message()
     {
-        return "取引先区分が{$this->label}の場合、取引先コードは「{$this->prefix}」始まりのみ可能です。";
+        if($this->supplierType == 1){
+
+            return '取引先区分が「得意先」の場合、取引先コードは「1」始まりのみ可能です。';
+
+        }elseif($this->supplierType == 2){
+
+            return '取引先区分が「仕入先」の場合、取引先コードは「2」始まりのみ可能です。';
+
+        }
     }
 }

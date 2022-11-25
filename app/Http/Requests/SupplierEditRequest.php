@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\SupplierType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class SupplierEditRequest extends FormRequest
 {
@@ -27,8 +29,7 @@ class SupplierEditRequest extends FormRequest
         return [
             // バリデーションの設定
             'name' => ['required', 'string', 'max:50'],
-            'code' => ['required', 'string', 'max:10'],
-            'supplier_type' => ['required', 'string', 'max:1'],
+            'supplier_type' => ['required', new Enum(SupplierType::class)],
         ];
     }
 
@@ -53,9 +54,9 @@ class SupplierEditRequest extends FormRequest
     {
         return [
             // 項目名称の設定
-            'name'    => '名前',
-            'code'    => '取引先コード',
-            'supplier_type' => '取引先区分',
+            'name'     => '取引先名',
+            'supplier_type'    => '取引先区分',
         ];
     }
+
 }

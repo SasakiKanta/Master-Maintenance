@@ -35,7 +35,7 @@
           <li>{{ trans('messages.error.info') }}</li>
         </ul>
       </div>
-      @endif 
+      @endif
 
       <!-- 入力フォーム -->
       <form id="edit-form" class="form-tag" method="POST" action="{{ route('suppliers.update', $id) }}">
@@ -45,28 +45,43 @@
         <div>
           <label for="first_name" class="label">取引先コード<span class="require-label"></span></label>
           <input type="text" id="code" name="code" value="{{old('code', $code)}}"
-            class="@error('code') error-text @enderror input-text" @if($id) readonly @endif >
+            class="@error('code') error-text @enderror input-text" placeholder="" @if($id) readonly @endif>
           @error('code')
           <p class="valid-msg">{{ $message }}</p>
           @enderror
         </div>
         <div>
           <label for="last_name" class="label">取引先名<span class="require-label"></span></label>
-          <input type="text" id="name" name="name" value="{{old('name', $name)}}" 
-            class="@error('name') error-text @enderror input-text">
+          <input type="text" id="name" name="name" value="{{old('name', $name)}}"
+            class="@error('name') error-text @enderror input-text" placeholder="">
           @error('name')
             <p class="valid-msg">{{ $message }}</p>
           @enderror
         </div>
         <div>
           <label for="last_name" class="label">取引先区分<span class="require-label"></span></label>
-          <select id="supplyKbn" name='supplier_type' class="w-max pr-8 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-            <option selected value="">選択してください</option>
+          <select id="supplier_type" name='supplier_type' class="select-box @error('supplier_type') error-text @enderror input-text">
+            <option value="">選択してください</option>
             <?php foreach (\App\Enums\SupplierType::cases() as $case) { ?>
-              <option value="{{ $case->value }}" @if(old('supplier_type', $supplier_type) === $case->value) selected @endif>{{ $case->label() }}</option>
+              <option value="{{ $case->value }}"
+                @if( old('supplier_type', $supplier_type) === $case->value) selected @endif>{{ $case->label() }}</option>
             <?php } ?>
           </select>
+            @error('supplier_type')
+            <p class="valid-msg">{{ $message }}</p>
+            @enderror
         </div>
+        <div>
+            <label for="last_name" class="label">担当者<span style="color: rgb(30 64 175); font-size: 0.75rem; line-height: 1rem; padding-left: 0.625rem; padding-right: 0.625rem; padding-top: 0.125rem; padding-bottom: 0.125rem; border-radius: 0.25rem; margin-left: 1.25rem; background-color: rgb(191 219 254);">任意</span></label>
+            <select id="user_id" name='user_id' class="select-box">
+              <option value="">選択してください</option>
+              <?php foreach ($users as $user) { ?>
+                <option value="{{$user->id}}"
+                @if( old('user_id', $user_id) == $user->id) selected @endif>
+                {{$user->name}}</option>
+              <?php } ?>
+            </select>
+          </div>
         <div class="flex">
           <!-- 登録・更新ボタン -->
           <button type="submit" class="update-btn">

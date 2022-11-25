@@ -19,7 +19,7 @@ enum Gender: string
         return match($this) {
             self::FEMALE => '女性',
             self::MALE   => '男性',
-            self::OTHER  => 'その他',       
+            self::OTHER  => 'その他',
         };
     }
 }

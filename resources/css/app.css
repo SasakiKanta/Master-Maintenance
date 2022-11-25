@@ -155,7 +155,7 @@ button.sort_button {
     width: 100%;
     /* text-decoration: underline; */
 }
-  
+
 button.sort_button_up::after {
     content: '　▲';
     font-size: 0.7rem;

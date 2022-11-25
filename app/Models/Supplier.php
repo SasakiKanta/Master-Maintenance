@@ -2,24 +2,24 @@
 
 namespace App\Models;
 
+use App\Enums\SupplierType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\SupplierType;
 
 class Supplier extends Model
 {
     use SoftDeletes;
 
     protected $guarded = [
-        'id', 
-        'created_at', 
-        'updated_at', 
+        'id',
+        'created_at',
+        'updated_at',
         'deleted_at'
     ];
 
     protected $hidden = [
-        'created_at', 
-        'updated_at', 
+        'created_at',
+        'updated_at',
         'deleted_at'
     ];
 
@@ -33,7 +33,6 @@ class Supplier extends Model
      * @return string　取引先区分名
      */
     public function getSupplierTypeLabelAttribute() {
-        
         $e = SupplierType::tryFrom($this->supplier_type);
         if ($e) {
             return $e->label();
@@ -43,7 +42,7 @@ class Supplier extends Model
     }
 
     /**
-     * 取引先 登録、更新
+     * 利用者 登録、更新
      *
      * @param $id ID
      * @param array $inputAll
@@ -55,6 +54,15 @@ class Supplier extends Model
 
         // 値が設定されている場合のみ、登録・更新として設定
         $supplier->fill($inputAll);
+
+        // 取引先区分
+        if($inputAll['supplier_type'] == '1') {
+            // 得意先時
+            $supplier->supplier_type = SupplierType::CUSTOMER->value;
+        } elseif($inputAll['supplier_type'] == '2') {
+            // 仕入れ先時
+            $supplier->supplier_type = SupplierType::SUPPLIER->value;
+        }
 
         // 登録・更新項目の設定
         $supplier->save();

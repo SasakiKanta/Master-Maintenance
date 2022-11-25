@@ -28,30 +28,31 @@
         @csrf
         <div class="search-condition">
           <div>
-            <label for="first_name" class="label">取引先コード</label>
-            <input type="text" id="code" name="code" value="{{$code ?? '' }}" class="input-text" placeholder="">
+            <label for="code" class="label">取引先コード</label>
+            <input type="text" id="code" name="code" value="{{ $code ?? '' }}" class="input-text">
           </div>
           <div>
-            <label for="second_name" class="label">取引先名</label>
-            <input type="text" id="name" name="name" value="{{$name ?? '' }}" class="input-text" placeholder="">
+            <label for="name" class="label">取引先名</label>
+            <input type="text" id="name" name="name" value="{{ $name ?? '' }}" class="input-text">
           </div>
           <div>
-            <label for="supplyKbn" class="label">取引先区分</label>
-            <select id="supplyKbn" name='supplier_type' class="select-box">
-              <option selected value="">すべて</option>
-              <?php foreach (\App\Enums\SupplierType::cases() as $case) { ?>
-                <option value="{{ $case->value }}" @if(($supplier_type ?? '') === $case->value) selected @endif>{{ $case->label() }}</option>
-              <?php } ?>
+            <label for="supplier_type" class="label">取引先区分</label>
+            <select id="supplier_type" name='supplier_type' class="input-text">
+                <option value="">すべて</option>
+                <?php foreach (\App\Enums\SupplierType::cases() as $case) { ?>
+                  <option value="{{ $case->value }}" @if(($supplier_type ?? '') === $case->value) selected @endif>{{ $case->label() }}</option>
+                <?php } ?>
             </select>
           </div>
         </div>
 
         <div class="flex">
-          <button type="submit"class="search-btn" >検索</button>
+          <button type="submit" class="search-btn">検索</button>
           <button type="button" class="clear-btn ml-4" onclick="location.href='{{ route('suppliers') }}';return false;">クリア</button>
           <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('suppliers.entry') }}';return false;">新規登録</button>
         </div>
       </form>
+
       <!-- 一覧表示 -->
       <?php if (isset($suppliers)) {  ?>
       <form id="list-form" class="form-tag" method="GET" action="{{ route('suppliers.paging') }}">
@@ -63,27 +64,23 @@
                 <th scope="col" class="py-2">{!! V::sortButton('id', 'ID', $sort) !!}</th>
                 <th scope="col" class="py-2">{!! V::sortButton('code', '取引先コード', $sort) !!}</th>
                 <th scope="col" class="py-2">{!! V::sortButton('name', '取引先名', $sort) !!}</th>
-                <th scope="col" class="py-2">取引先区分</th>
+                <th scope="col" class="py-2">{!! V::sortButton('supplier_type', '取引先区分', $sort) !!}</th>
                 <th>&nbsp;</th>
               </tr>
             </thead>
             <!-- 一覧部 -->
             <tbody class="list-table-body">
-            <?php 
-            $i = 1;
-            foreach ($suppliers as $supplier) { ?>
+            <?php foreach ($suppliers as $supplier) { ?>
               <tr class="list-table-body-tr">
-                <td class="py-2 px-4 text-center">{{$supplier->id}}</td>
-                <td class="py-2 px-4"><a href="/suppliers/{{$supplier->id}}">{{$supplier->code}}</a></td>
-                <td class="py-2 px-4">{{$supplier->name}}</td>
-                <td class="py-2 px-4 text-center">{{$supplier->supplierTypeLabel}}</td>
+                <td class="py-2 px-4 text-center">{{ $supplier->id }}</td>
+                <td class="py-2 px-4">{{ $supplier->code }}</td>
+                <td class="py-2 px-4">{{ $supplier->name }}</td>
+                <td class="py-2 px-4 text-center">{{ $supplier->supplierTypeLabel }}</td>
                 <td class="text-center">
                   <button type="button" class="edit-btn" onclick='location.href="/suppliers/{{$supplier->id}}";return false;'>更新</button>
                 </td>
               </tr>
-            <?php
-            $i++;
-            } ?>
+            <?php } ?>
             </tbody>
           </table>
           @if (count($suppliers) == 0)

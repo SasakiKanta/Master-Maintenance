@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SupplierType;
+use App\Http\Requests\SupplierEditRequest;
+use App\Http\Requests\SupplierEntryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use App\Http\Requests\SupplierEntryRequest;
-use App\Http\Requests\SupplierEditRequest;
 use App\Models\Supplier;
+use App\Models\User;
 
 /**
- * 取引先マスタ検索 コントローラークラス
+ * 利用者マスタ検索 コントローラークラス
  */
 class SuppliersController extends Controller
 {
     /** セッションキー */
-    protected $SESSION_KEY = 'SUPPLIERS';
+    protected $SESSION_KEY = 'SUPPLIER';
 
     /** ソートカラム */
-    protected $SORT_TARGET = ['id', 'code', 'name', 'supplier_type'];
+    protected $SORT_TARGET = ['id','code', 'name', 'supplier_type'];
 
     /**
      * 初期化
@@ -58,12 +60,15 @@ class SuppliersController extends Controller
      */
     public function entry(Request $request)
     {
+        $user = User::select('id', 'name')->orderBy('id')->get();
         // 画面に初期値を設定
         return view('supplier_detail', [
             'id'  => 0,
-            'name'  => '',
             'code'  => '',
-            'supplier_type' => '',
+            'name' => '',
+            'supplier_type' => SupplierType::CUSTOMER->value,
+            'users' => $user,
+            'user_id' => '',
         ]);
     }
 
@@ -76,14 +81,17 @@ class SuppliersController extends Controller
      */
     public function edit($id, Request $request)
     {
-        $user = Supplier::findOrFail($id);
+        $supplier = Supplier::findOrFail($id);
+        $user = User::select('id', 'name')->orderBy('id')->get();
 
         // 各値を設定し、画面に返却
         return view('supplier_detail', [
             'id'      => $id,
-            'name'  => $user->name,
-            'code'  => $user->code,
-            'supplier_type' => $user->supplier_type,
+            'code'    => $supplier->code,
+            'name'   => $supplier->name,
+            'supplier_type' => $supplier->supplier_type,
+            'users' => $user,
+            'user_id' => $supplier->user_id,
         ]);
     }
 
@@ -93,22 +101,22 @@ class SuppliersController extends Controller
      * @param SupplierEntryRequest $request
      * @param $id ID
      * @return route
-     */    
-    public function insert(SupplierEntryRequest $request, $id = 0)
+     */
+    public function insert(SupplierEntryRequest $request, $id = 0,)
     {
         // リクエストパラメータの取得
         $inputAll = $request->all();
 
         // 登録内部処理
         $supplier = $this->upsert($id, $inputAll);
-        $id = $supplier->id;
+        $supplierId = $supplier->id;
 
         // メッセージの作成(messages.phpより本文を取得)
         $completeMessage = trans('messages.regist.complete');
 
         // 各データ設定後、編集画面にリダイレクト
         return redirect()->route('suppliers.edit', [
-            'id' => $id,
+            'id' => $supplierId,
         ])->with('flash_message', $completeMessage);
     }
 
@@ -116,9 +124,9 @@ class SuppliersController extends Controller
      * 更新処理
      *
      * @param $id ID
-     * @param SupplierEditRequest $request
+     * @param UserEditRequest $request
      * @return route
-     */    
+     */
     public function update($id, SupplierEditRequest $request)
     {
         // リクエストパラメータの取得
@@ -174,7 +182,7 @@ class SuppliersController extends Controller
 
     /**
      * 検索
-     * 
+     *
      * @param Request $request
      * @return view
      */
@@ -188,7 +196,7 @@ class SuppliersController extends Controller
 
     /**
      * ソート、ページング
-     * 
+     *
      * @param Request $request
      * @return view
      */
@@ -208,7 +216,7 @@ class SuppliersController extends Controller
 
     /**
      * 検索処理
-     * 
+     *
      * @param Request $request
      * @return view
      */
@@ -217,40 +225,40 @@ class SuppliersController extends Controller
         // 検索条件取得
         if (Session::has($this->SESSION_KEY)) {
             // セッションから復元
-            $name = Session::get("{$this->SESSION_KEY}.NAME", '');
             $code = Session::get("{$this->SESSION_KEY}.CODE", '');
-            $supplier_type = Session::get("{$this->SESSION_KEY}.SUPPLIER_TYPE", '');
+            $name = Session::get("{$this->SESSION_KEY}.NAME", '');
+            $supplierType = Session::get("{$this->SESSION_KEY}.SUPPLIER_TYPE", '');
             $sort = Session::get("{$this->SESSION_KEY}.SORT", []);
             $page = Session::get("{$this->SESSION_KEY}.PAGE", 0);
         } else {
             // リスエストパラメータから取得
-            $name = $request->name;
             $code = $request->code;
-            $supplier_type = $request->supplier_type;
+            $name = $request->name;
+            $supplierType = $request->supplier_type;
             $sort = [];
             $page = 0;
 
-            Session::put("{$this->SESSION_KEY}.NAME", $name);
             Session::put("{$this->SESSION_KEY}.CODE", $code);
-            Session::put("{$this->SESSION_KEY}.SUPPLIER_TYPE", $supplier_type);           
+            Session::put("{$this->SESSION_KEY}.NAME", $name);
+            Session::put("{$this->SESSION_KEY}.SUPPLIER_TYPE", $supplierType);
         }
 
         $query = Supplier::query();
-        
+
         // 画面の検索条件を設定
-        if ($name <> '') {
-            // 取引先名
-            $query->where('name', 'like', '%' . parent::escapeLikeQuery($name) . '%');
-        }
         if ($code <> '') {
             // 取引先コード
             $query->where('code', 'like', '%' . parent::escapeLikeQuery($code) . '%');
         }
-        if ($supplier_type <> '') {
-            // 取引先区分
-            $query->where('supplier_type', '=' , $supplier_type);
+        if ($name <> '') {
+            // 取引先名
+            $query->where('name', 'like', '%' . parent::escapeLikeQuery($name) . '%');
         }
-       
+        if ($supplierType <> '') {
+            // 取引先区分
+            $query->where('supplier_type', '=', $supplierType);
+        }
+
         // 並び順の設定
         foreach ($this->SORT_TARGET as $target) {
             if (array_key_exists($target, $sort)) {
@@ -266,9 +274,9 @@ class SuppliersController extends Controller
 
         // 各値を設定し、画面に返却
         return view('suppliers', [
-            'name'  => $name,
             'code' => $code,
-            'supplier_type' => $supplier_type,
+            'name'  => $name,
+            'supplier_type' => $supplierType,
             'sort'   => $sort,
             'suppliers' => $suppliers,
         ]);

@@ -16,7 +16,7 @@ enum SupplierType: string
     public function label(): string
     {
         return match($this) {
-            self::CUSTOMER => '得意先',
+            self:: CUSTOMER=> '得意先',
             self::SUPPLIER => '仕入先',
         };
     }
