@@ -29,7 +29,7 @@ class CustomerRequest extends FormRequest
     {
 
         $id = $this->route('id');
-        return [
+        $rule = [
             // バリデーションの設定
             'surname'       =>      ['required', 'string', 'max:25'],
             'name'          =>      ['required', 'string', 'max:25'],
@@ -45,6 +45,8 @@ class CustomerRequest extends FormRequest
             'supplier_id'   =>      [],
             'position'      =>      [],
         ];
+
+        return $rule;
     }
 
     public function withValidator(Validator $validator){

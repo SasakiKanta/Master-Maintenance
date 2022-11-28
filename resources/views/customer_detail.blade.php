@@ -61,11 +61,11 @@
                     </div>
                     <div class="text-center col">
                     <label class="label">顧客区分</label>
-                    <?php foreach (\App\Enums\CUstomerType::cases() as $case) { ?>
-                        <label><input type="radio" name="customer_type" value="{{ $case->value }}" onclick="customerTypeChange();"
+                    <?php foreach (\App\Enums\CustomerType::cases() as $case) { ?>
+                        <label><input type="radio" name="customer_type" id="customer{{ $case->value }}" value="{{ $case->value }}" onclick="customerTypeChange();"
                             @if( old('customer_type', $customer_type) === $case->value) checked
-                            @elseif($case->value == 1 && !$id) checked
-                            @endif>{{ $case->label() }}
+                            @endif
+                            >{{ $case->label() }}
                         </label>
                     <?php } ?>
                     </div>
@@ -206,21 +206,41 @@
                 </div>
 
                 <script>
-                    if(!$completeMessage || )
-                    document.getElementById('supplier_name').style.display =  "none";
-                    document.getElementById('title').style.display = "none";
 
+                    //個人ボタンの取得
+                    check_1 = document.getElementById("customer1");
+
+                    //法人ボタンの取得
+                    check_2 = document.getElementById("customer2");
+
+                    //新規登録時に個人ボタンにチェックをつける
+                    if(!(check_1.checked || check_2.checked)){
+                    check_1.checked = true;
+                    };
+
+                    //個人ボタンにチェックが個人の時に項目を隠す
+                    if(check_1.checked){
+                    document.getElementById('supplier_name').style.display = "none";
+                    document.getElementById('title').style.display = "none";
+                    };
+
+                    //顧客区分のボタンが押されたときの処理
                     function customerTypeChange(){
-                        radio = document.querySelectorAll(`input[type='radio'][name='customer_type']`)
+
+                        radio = document.querySelectorAll(`input[type='radio'][name='customer_type']`);
+
                         if(radio[0].checked) {
+
                             document.getElementById('supplier_name').style.display =  "none";
                             document.getElementById('title').style.display = "none";
+
                         }else if(radio[1].checked) {
+
                             document.getElementById('supplier_name').style.display = "";
                             document.getElementById('title').style.display = "";
-                        }
+
+                        };
                     }
-                    window.onload;
                 </script>
 
                     <div class="mb-4">
