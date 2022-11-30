@@ -89,6 +89,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('{id}', [CustomersController::class, 'delete'])->name('customers.delete');
         Route::post('search', [CustomersController::class, 'search'])->name('customers.search');
         Route::get('search', [CustomersController::class, 'paging'])->name('customers.paging');
-        Route::post('csv', [CustomersController::class, 'csv'])->name('customers.csv');
+        Route::get('csv', [CustomersController::class, 'csv'])->name('customers.csv');
     });
 });

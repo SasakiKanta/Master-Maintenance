@@ -30,7 +30,7 @@
       <!-- エラーメッセージ部 -->
       @if ($errors->any())
       <div class="flash-err">
-        <ul class="mb-1">
+        <ul class="mb-1" style="padding: 0px">
           <!-- エラーを出力 -->
           <li>{{ trans('messages.error.info') }}</li>
         </ul>
@@ -62,10 +62,12 @@
                     <div class="text-center col">
                     <label class="label">顧客区分</label>
                     <?php foreach (\App\Enums\CustomerType::cases() as $case) { ?>
-                        <label><input type="radio" name="customer_type" id="customer{{ $case->value }}" value="{{ $case->value }}" onclick="customerTypeChange();"
-                            @if( old('customer_type', $customer_type) === $case->value) checked
-                            @endif
-                            >{{ $case->label() }}
+                        <label>
+                            <input type="radio" name="customer_type" id="customer{{ $case->value }}" value="{{ $case->value }}" onclick="customerTypeChange();"
+                                @if( old('customer_type', $customer_type) === $case->value) checked
+                                @elseif($case->value == 1 && !$id) checked
+                                @endif
+                                >{{ $case->label() }}
                         </label>
                     <?php } ?>
                     </div>
@@ -179,8 +181,8 @@
                         @enderror
                     </div>
                 </div>
-                <div class="d-flex justify-content-start mb-4">
-                    <div class="me-3 col" id="supplier_name">
+                <div class="d-flex justify-content-start">
+                    <div class="me-3 col mb-4" id="supplier_name"  style="@if(!(old('customer_type', $customer_type) == 2)) display: none @endif">
                         <label for="supplier_id" class="label">取引先名<span class="require-label"></span></label>
                         <select id="supplier_id" name='supplier_id' class="@error('supplier_id') error-text @enderror input-text">
                         <option value="">選択してください</option>
@@ -195,7 +197,7 @@
                         <p class="valid-msg">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="col" id="title">
+                    <div class="col mb-4" id="title"  style="@if(!(old('customer_type', $customer_type) == 2)) display: none @endif">
                         <label for="position" class="label">肩書</label>
                         <input type="text" id="position" name="position" value="{{old('position', $position)}}"
                         class="@error('position') error-text @enderror input-text" placeholder="">
@@ -204,45 +206,6 @@
                         @enderror
                     </div>
                 </div>
-
-                <script>
-
-                    //個人ボタンの取得
-                    check_1 = document.getElementById("customer1");
-
-                    //法人ボタンの取得
-                    check_2 = document.getElementById("customer2");
-
-                    //新規登録時に個人ボタンにチェックをつける
-                    if(!(check_1.checked || check_2.checked)){
-                    check_1.checked = true;
-                    };
-
-                    //個人ボタンにチェックが個人の時に項目を隠す
-                    if(check_1.checked){
-                    document.getElementById('supplier_name').style.display = "none";
-                    document.getElementById('title').style.display = "none";
-                    };
-
-                    //顧客区分のボタンが押されたときの処理
-                    function customerTypeChange(){
-
-                        radio = document.querySelectorAll(`input[type='radio'][name='customer_type']`);
-
-                        if(radio[0].checked) {
-
-                            document.getElementById('supplier_name').style.display =  "none";
-                            document.getElementById('title').style.display = "none";
-
-                        }else if(radio[1].checked) {
-
-                            document.getElementById('supplier_name').style.display = "";
-                            document.getElementById('title').style.display = "";
-
-                        };
-                    }
-                </script>
-
                     <div class="mb-4">
                         <label for="remark" class="label">管理者メモ</label>
                         <textarea id="remark" name="remark"
@@ -280,6 +243,21 @@
       document.getElementById('form-method').value = 'DELETE';
       form.submit();
     }
+  }
+  //顧客区分のボタンが押されたときの処理
+  function customerTypeChange() {
+
+    radio = document.querySelectorAll(`input[type='radio'][name='customer_type']`);
+
+    if(radio[0].checked) {
+        document.getElementById('supplier_name').style.display =  "none";
+        document.getElementById('title').style.display = "none";
+        document.getElementById('supplier_id').selectedIndex = 0;
+        document.getElementById('position').value = "";
+    }else if(radio[1].checked) {
+        document.getElementById('supplier_name').style.display =  "";
+        document.getElementById('title').style.display = "";
+    };
   }
 </script>
 @endpush

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CustomerType;
+use App\Enums\Gender;
 use App\Http\Requests\CustomerRequest;
 use App\Models\Customer;
 use Illuminate\Http\Request;
@@ -363,9 +365,118 @@ class CustomersController extends Controller
      * @param Request $request
      */
     public function csv(Request $request){
-        $customers = Customer::all();
-        $f = fopen('php://temp', 'w');
-        $arr = array('id', 'customer_type', 'full_name', '');
+        //セッションから値を復元
+        $name           =       Session::get("{$this->SESSION_KEY}.NAME", '');
+        $name_kana      =       Session::get("{$this->SESSION_KEY}.NAME_KANA", '');
+        $gender         =       Session::get("{$this->SESSION_KEY}.GENDER", '');
+        $addr           =       Session::get("{$this->SESSION_KEY}.ADDR", '');
+        $email          =       Session::get("{$this->SESSION_KEY}.EMAIL", '');
+        $supplier_name  =       Session::get("{$this->SESSION_KEY}.SUPPLIER_NAME", '');
+        $sort           =       session::get("{$this->SESSION_KEY}.SORT", '');
 
+        //csvファイルに必要なクエリの作成
+        $customers = Customer::query();
+        $customers->select('customers.id',
+        'customers.customer_type',
+        'customers.full_name',
+        'customers.full_name_kana',
+        'customers.gender',
+        'customers.birthday',
+        'customers.zip',
+        'customers.addr',
+        'customers.tel',
+        'customers.email',
+        'customers.supplier_id',
+        'suppliers.name',
+        'customers.position')
+        ->from('customers')->leftjoin('suppliers', function ($join) {
+            $join->on('customers.supplier_id', '=', 'suppliers.id');
+        });
+
+        if ($name <> '') {
+            // 名前
+            $customers->where('customers.full_name', 'like', '%' . parent::escapeLikeQuery($name) . '%');
+        }
+        if ($name_kana <> '') {
+            // フリガナ
+            $customers->where('customers.full_name_kana', 'like', '%' . parent::escapeLikeQuery($name_kana) . '%');
+        }
+        if ($gender <> '') {
+            // 性別
+            $customers->where('customers.gender', '=', $gender);
+        }
+        if ($addr <> '') {
+            // 住所
+            $customers->where('customers.addr', 'like', '%' . parent::escapeLikeQuery($addr) . '%');
+        }
+        if ($email <> '') {
+            // メールアドレス
+            $customers->where('customers.email', 'like', '%' . parent::escapeLikeQuery($email) . '%');
+        }
+        if ($supplier_name <> '') {
+            // 取引先名
+            $customers->where('suppliers.name', 'like', '%' . parent::escapeLikeQuery($supplier_name) . '%');
+        }
+
+        // 並び順の設定
+        foreach ($this->SORT_TARGET as $target) {
+        if (array_key_exists($target, $sort)) {
+            $customers = $customers->orderBy($target, $sort[$target] === 'asc' ? 'asc' : 'desc');
+            }
+        }
+        // 第2ソート
+        $customers = $customers->orderBy('customers.id');
+        $customers = $customers->get();
+
+        $stream = fopen('php://temp', 'w');
+        //csvのヘッダーを作成
+        $headline = "ID,\"顧客区分\",\"名前\",\"フリガナ\",\"性別\",\"生年月日\",\"郵便番号\",\"住所\",\"電話番号\",\"メールアドレス\",\"取引先コード\",\"取引先名\",\"肩書\"\n";
+        fwrite($stream, $headline);
+
+        //csvの内容の作成
+        foreach ($customers as $customer) {
+            $out = "";
+            $cnt = 1;
+            $arrInfo = array(
+                'ID'                =>  $customer->id,
+                '顧客区分'          =>  CustomerType::from($customer->customer_type)->label(),
+                '名前'              =>  $customer->full_name,
+                'フリガナ'          =>  $customer->full_name_kana,
+                '性別'              =>  Gender::from($customer->gender)->label(),
+                '生年月日'          =>  $customer->birthday,
+                '郵便番号'          =>  $customer->zip,
+                '住所'              =>  $customer->addr,
+                '電話番号'          =>  $customer->tel,
+                'メールアドレス'    =>  $customer->email,
+                '取引先コード'      =>  $customer->supplier_id,
+                '取引先名'          =>  $customer->name,
+                '肩書'              =>  $customer->position,
+            );
+
+            //囲み文字を入れる処理
+            foreach($arrInfo as $key => $value) {
+                if($key == 'ID'){
+                    $out .= $value;
+                }else{
+                    $out .= "\"" . $value . "\"";
+                }
+                if($cnt< count($arrInfo)){
+                    $out .= ",";
+                } else {
+                    $out .= "\n";
+                }
+                $cnt++;
+            }
+            fwrite($stream, $out);
+        };
+        rewind($stream);
+        $csv =str_replace(PHP_EOL, "\n", stream_get_contents($stream));
+        $csv = mb_convert_encoding($csv, 'UTF-8');
+        fclose($stream);
+        $headers = array(
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=顧客データ_YYYYMMDDHHMMSS.csv'
+        );
+        return response()->make($csv, 200, $headers);
     }
 }

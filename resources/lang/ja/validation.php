@@ -28,4 +28,8 @@ return [
     'unique' => ':attributeは既に使用されています。',
     'required' => ':attributeは必ず指定してください。',
     'enum' => ':attributeの登録がありません。',
+    'alpha_num' => ':attributeは半角英数字で入力してください',
+    'integer' => ':attributeは整数で入力してください。',
+    'regex' => ':attributeはハイフンなし数字7桁で入力してください。',
+    'exists' => ':attributeではありません。',
 ];

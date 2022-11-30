@@ -61,7 +61,7 @@
           <button type="submit" class="search-btn">検索</button>
           <button type="button" class="clear-btn ml-4" onclick="location.href='{{ route('customers') }}';return false;">クリア</button>
           <?php if (isset($customers)) {  ?>
-          <button type="submit" class="search-btn ms-4" onclick="location.href='{{ route('customers.csv') }}';return false;">CSVダウンロード</button>
+          <button type="button" class="search-btn ms-4" onclick="location.href='{{ route('customers.csv') }}';return false;">CSVダウンロード</button>
           <?php } ?>
           <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('customers.entry') }}';return false;">新規登録</button>
         </div>
