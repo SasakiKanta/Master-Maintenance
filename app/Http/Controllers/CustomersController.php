@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use App\Models\Supplier;
+use App\Models\Zipcode;
 
 /**
  * 利用者マスタ検索 コントローラークラス
@@ -478,5 +479,23 @@ class CustomersController extends Controller
             'Content-Disposition' => 'attachment; filename=顧客データ_YYYYMMDDHHMMSS.csv'
         );
         return response()->make($csv, 200, $headers);
+    }
+
+    /**
+     * zipcode検索
+     *
+     * @param Request $request
+     */
+    protected function zip(Request $request) {
+        $zip = $request->all();
+        $zip = $zip['zip'];
+        $zip = str_replace('-', "", $zip);
+        $addresses = Zipcode::select(
+                            'pref_name',
+                            'municipality_name',
+                            'town_name',
+                            )->where('zip_cd', '=', "$zip")->first();
+        $json = $addresses;
+        return response()->json($json);
     }
 }

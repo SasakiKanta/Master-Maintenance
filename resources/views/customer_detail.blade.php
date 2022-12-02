@@ -114,14 +114,17 @@
                         @enderror
                     </div>
                 </div>
-                <div class="d-flex justify-content-start mb-4">
-                    <div class="me-3 col-4">
+                <div class="d-flex align-items-end mb-4">
+                    <div class="me-3 col-2">
                         <label for="zip" class="label">郵便番号</label>
                         <input type="text" id="zip" name="zip" value="{{old('zip', $zip)}}"
                         class="@error('zip') error-text @enderror input-text" placeholder="">
                         @error('zip')
                         <p class="valid-msg">{{ $message }}</p>
                         @enderror
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-secondary" onclick="zipcodesearch()">住所検索</button>
                     </div>
                     <div class="col-4">
                         <label for="prefcode" class="label">都道府県</label>
@@ -258,6 +261,35 @@
         document.getElementById('supplier_name').style.display =  "";
         document.getElementById('title').style.display = "";
     };
+  }
+
+  //郵便番号検索処理
+  function zipcodesearch () {
+    let element = document.getElementById('zip');
+    let value = element.value;
+    var addr_1 = document.getElementById('addr_1');
+    var addr_2 = document.getElementById('addr_2');
+    var prefcodes = document.querySelectorAll(`select[name = 'prefcode'] option`);
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", `/customers/zip/?zip=${value}`, true);
+    xhr.send();
+    xhr.addEventListener('load', function(){
+        if(xhr.readyState == 4 && xhr.status == 200) {
+            var json = xhr.response;
+            json = JSON.parse(json);
+            if (Object.keys(json).length) {
+                addr_1.value = json['municipality_name'];
+                addr_2.value = json['town_name'];
+                for (let prefcode of prefcodes) {
+                    if (prefcode.text == json['pref_name']) {
+                        prefcode.selected = true;
+                    }
+                }
+            } else {
+                alert('該当する住所が見つかりません。')
+            }
+        }
+    });
   }
 </script>
 @endpush

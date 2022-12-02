@@ -35,8 +35,8 @@ class CustomerRequest extends FormRequest
             // バリデーションの設定
             'surname'       =>      ['required', 'string', 'max:25'],
             'name'          =>      ['required', 'string', 'max:25'],
-            'surname_kana'  =>      ['string', 'max:50'],
-            'name_kana'     =>      ['string', 'max:50'],
+            'surname_kana'  =>      ['string', 'max:50', 'nullable'],
+            'name_kana'     =>      ['string', 'max:50', 'nullable'],
             'gender'        =>      [new Enum(Gender::class)],
             'birthday'      =>      ['required'],
             'email'         =>      ['required', 'string', 'email', 'max:254', "unique:customers,email,${id},id,deleted_at,NULL"],

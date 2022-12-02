@@ -53,7 +53,7 @@ enum Pref: string
     case OITA      = '44';
     case MIYAZAKI  = '45';
     case KAGOSHIMA = '46';
-    case OKINAWA   = '47';    
+    case OKINAWA   = '47';
 
     /**
      * 表示用のテキストを取得
@@ -107,7 +107,7 @@ enum Pref: string
             self::OITA      => '大分県',
             self::MIYAZAKI  => '宮崎県',
             self::KAGOSHIMA => '鹿児島県',
-            self::OKINAWA   => '沖縄県',            
+            self::OKINAWA   => '沖縄県',
         };
     }
 }
