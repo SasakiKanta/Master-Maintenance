@@ -24,7 +24,7 @@
       @endif
 
       <!-- 検索フォーム -->
-      <form id="search-form" class="form-tag" method="POST" action="{{ route('customers.search') }}">
+      <form id="search-form" class="form-tag" method="POST" action="{{ route('customers.search') }}" enctype="multipart/form-data">
         @csrf
         <div class="search-condition">
           <div>
@@ -63,6 +63,11 @@
           <?php if (isset($customers)) {  ?>
           <button type="button" class="search-btn ms-4" onclick="location.href='{{ route('customers.csv') }}';return false;">CSVダウンロード</button>
           <?php } ?>
+          <input type="file" class="bg-gray-50 ml-4 border" name="csvfile" id="csvfile" onchange="uploadChange();">
+          <button type="button" id="upload" class="search-btn ml-4" style="display: none" onclick="fileSubmit();">アップロード</button>
+          @if ($is_upload ?? "")
+          <a href="#">正常終了</a>
+          @endif
           <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('customers.entry') }}';return false;">新規登録</button>
         </div>
       </form>
@@ -115,3 +120,22 @@
   </div>
 </main>
 @endsection
+
+@push('file-script')
+<script>
+    function uploadChange() {
+        var file = document.getElementById('csvfile');
+        if (file.value) {
+            document.getElementById('upload').style.display =  "";
+        } else {
+            document.getElementById('upload').style.display =  "none";
+        }
+    }
+
+    function fileSubmit() {
+        let form = document.getElementById('search-form');
+        form.action = "{{ route('customers.upload') }}";
+        form.submit();
+    }
+</script>
+@endpush

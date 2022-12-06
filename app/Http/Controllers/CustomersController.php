@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\CustomerType;
 use App\Enums\Gender;
+use App\Enums\Pref;
 use App\Http\Requests\CustomerRequest;
 use App\Models\Customer;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use App\Models\Supplier;
 use App\Models\Zipcode;
+use Exception;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * 利用者マスタ検索 コントローラークラス
@@ -373,24 +376,33 @@ class CustomersController extends Controller
         $addr           =       Session::get("{$this->SESSION_KEY}.ADDR", '');
         $email          =       Session::get("{$this->SESSION_KEY}.EMAIL", '');
         $supplier_name  =       Session::get("{$this->SESSION_KEY}.SUPPLIER_NAME", '');
-        $sort           =       session::get("{$this->SESSION_KEY}.SORT", '');
+        $sort           =       Session::get("{$this->SESSION_KEY}.SORT", []);
 
         //csvファイルに必要なクエリの作成
         $customers = Customer::query();
-        $customers->select('customers.id',
-        'customers.customer_type',
-        'customers.full_name',
-        'customers.full_name_kana',
-        'customers.gender',
-        'customers.birthday',
-        'customers.zip',
-        'customers.addr',
-        'customers.tel',
-        'customers.email',
-        'customers.supplier_id',
-        'suppliers.name',
-        'customers.position')
-        ->from('customers')->leftjoin('suppliers', function ($join) {
+        $customers->select([
+            'customers.id',
+            'customers.customer_type',
+            'customers.surname',
+            'customers.name as c_name',
+            'customers.surname_kana',
+            'customers.name_kana',
+            'customers.full_name',
+            'customers.full_name_kana',
+            'customers.gender',
+            'customers.birthday',
+            'customers.zip',
+            'customers.prefcode',
+            'customers.addr_1',
+            'customers.addr_2',
+            'customers.addr_3',
+            'customers.addr',
+            'customers.tel',
+            'customers.email',
+            'customers.supplier_id',
+            'customers.position',
+            'suppliers.name',
+        ])->from('customers')->leftjoin('suppliers', function ($join) {
             $join->on('customers.supplier_id', '=', 'suppliers.id');
         });
 
@@ -421,8 +433,8 @@ class CustomersController extends Controller
 
         // 並び順の設定
         foreach ($this->SORT_TARGET as $target) {
-        if (array_key_exists($target, $sort)) {
-            $customers = $customers->orderBy($target, $sort[$target] === 'asc' ? 'asc' : 'desc');
+            if (array_key_exists($target, $sort)) {
+                $customers = $customers->orderBy($target, $sort[$target] === 'asc' ? 'asc' : 'desc');
             }
         }
         // 第2ソート
@@ -431,7 +443,7 @@ class CustomersController extends Controller
 
         $stream = fopen('php://temp', 'w');
         //csvのヘッダーを作成
-        $headline = "ID,\"顧客区分\",\"名前\",\"フリガナ\",\"性別\",\"生年月日\",\"郵便番号\",\"住所\",\"電話番号\",\"メールアドレス\",\"取引先コード\",\"取引先名\",\"肩書\"\n";
+        $headline = "ID,\"顧客区分CD\",\"顧客区分\",\"姓\",\"名\",\"姓（フリガナ）\",\"名（フリガナ）\",\"性別CD\",\"性別\",\"生年月日\",\"郵便番号\",\"都道府県CD\",\"都道府県\",\"市区群町村\",\"番地・町名\",\"マンション・建物名など\",\"電話番号\",\"メールアドレス\",\"取引先コード\",\"取引先名\",\"肩書\"\n";
         fwrite($stream, $headline);
 
         //csvの内容の作成
@@ -439,19 +451,27 @@ class CustomersController extends Controller
             $out = "";
             $cnt = 1;
             $arrInfo = array(
-                'ID'                =>  $customer->id,
-                '顧客区分'          =>  CustomerType::from($customer->customer_type)->label(),
-                '名前'              =>  $customer->full_name,
-                'フリガナ'          =>  $customer->full_name_kana,
-                '性別'              =>  Gender::from($customer->gender)->label(),
-                '生年月日'          =>  $customer->birthday,
-                '郵便番号'          =>  $customer->zip,
-                '住所'              =>  $customer->addr,
-                '電話番号'          =>  $customer->tel,
-                'メールアドレス'    =>  $customer->email,
-                '取引先コード'      =>  $customer->supplier_id,
-                '取引先名'          =>  $customer->name,
-                '肩書'              =>  $customer->position,
+                'ID'                        =>  $customer->id,
+                '顧客区分CD'                =>  $customer->customer_type,
+                '顧客区分'                  =>  $customer->customer_type_label,
+                '姓'                        =>  $customer->surname,
+                '名'                        =>  $customer->c_name,
+                '姓（フリガナ）'            =>  $customer->surname_kana,
+                '名（フリガナ）'            =>  $customer->name_kana,
+                '性別CD'                    =>  $customer->gender,
+                '性別'                      =>  $customer->gender_label,
+                '生年月日'                  =>  $customer->birthday,
+                '郵便番号'                  =>  $customer->zip,
+                '都道府県CD'                =>  $customer->prefcode,
+                '都道府県'                  =>  $customer->pref_label,
+                '市区群町村'                =>  $customer->addr_1,
+                '番地・町名'                =>  $customer->addr_2,
+                'マンション・建物名など'    =>  $customer->addr_3,
+                '電話番号'                  =>  $customer->tel,
+                'メールアドレス'            =>  $customer->email,
+                '取引先コード'              =>  $customer->supplier_id,
+                '取引先名'                  =>  $customer->name,
+                '肩書'                      =>  $customer->position,
             );
 
             //囲み文字を入れる処理
@@ -497,5 +517,69 @@ class CustomersController extends Controller
                             )->where('zip_cd', '=', "$zip")->first();
         $json = $addresses;
         return response()->json($json);
+    }
+
+
+
+    /**
+     * アップロードファイルからの登録処理
+     *
+     * @param Request $request
+     */
+    public function upload(Request $request){
+        $values = [];
+        $columu = [
+            'id',
+            'customer_type',
+            'customer_type_label',
+            'surname',
+            'name',
+            'surname_kana',
+            'name_kana',
+            'gender',
+            'gender_label',
+            'birthday',
+            'zip',
+            'prefcode',
+            'prefcode_label',
+            'addr_1',
+            'addr_2',
+            'addr_3',
+            'tel',
+            'email',
+            'supplier_id',
+            'supplier_name',
+            'position',
+        ];
+        //ファイルを保存
+        $request->csvfile->storeAs('public/', "customers.csv");
+        //ファイル内容を取得
+        $csv = Storage::disk('local')->get('public/customers.csv');
+        $csv = str_replace("\"", '', $csv);
+        $array = explode("\n", $csv);
+        $array = array_filter($array, "strlen");
+        $array = array_values($array);
+
+        foreach ($array as $row) {
+            $arr = explode(",", $row);
+            $arr = array_combine($columu, $arr);
+            unset($arr['customer_type']);
+            unset($arr['customer_type_label']);
+            unset($arr['gender_label']);
+            unset($arr['prefcode_label']);
+            unset($arr['supplier_name']);
+            array_push($values, $arr);
+        }
+
+        array_shift($values);
+
+        foreach ($values as $value) {
+            $id = $value['id'];
+            $inputAll = $value;
+            $this->upsert($id, $inputAll);
+        }
+        return view('customers',[
+            'is_upload' =>  true,
+        ]);
     }
 }

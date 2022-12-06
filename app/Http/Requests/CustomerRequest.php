@@ -40,7 +40,7 @@ class CustomerRequest extends FormRequest
             'gender'        =>      [new Enum(Gender::class)],
             'birthday'      =>      ['required'],
             'email'         =>      ['required', 'string', 'email', 'max:254', "unique:customers,email,${id},id,deleted_at,NULL"],
-            'zip'           =>      ['regex:/^[0-9]{7}$/'],
+            'zip'           =>      ['regex:/^[0-9]{7}$/', 'nullable'],
             'addr_1'        =>      ['max:100'],
             'addr_2'        =>      ['max:100'],
             'addr_3'        =>      ['max:100'],

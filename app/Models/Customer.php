@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CustomerType;
 use App\Enums\Gender;
 use App\Enums\Pref;
 use Illuminate\Database\Eloquent\Model;
@@ -61,6 +62,37 @@ class Customer extends Model
     }
 
     /**
+     * 顧客区分のラベルを返します。
+     *
+     * @return string　顧客区分
+     */
+    public function getCustomerTypeLabelAttribute() {
+
+        $e = CustomerType::tryFrom($this->customer_type);
+        if ($e) {
+            return $e->label();
+        } else {
+            return "";
+        }
+    }
+
+
+    /**
+     * 顧客区分のラベルを返します。
+     *
+     * @return string　都道府県
+     */
+    public function getPrefLabelAttribute() {
+
+        $e = Pref::tryFrom($this->prefcode);
+        if ($e) {
+            return $e->label();
+        } else {
+            return "";
+        }
+    }
+
+    /**
      * 利用者 登録、更新
      *
      * @param $id ID
@@ -81,7 +113,7 @@ class Customer extends Model
         $customer->full_name_kana = $inputAll['surname_kana'] . $inputAll['name_kana'];
 
         //住所を設定
-        $customer->addr = Pref::from($inputAll['prefcode'])->label() . $inputAll['addr_1'] . $inputAll['addr_2'] . $inputAll['addr_3'];
+        $customer->addr = $customer->pref_label . $inputAll['addr_1'] . $inputAll['addr_2'] . $inputAll['addr_3'];
 
         // 登録・更新項目の設定
         $customer->save();
