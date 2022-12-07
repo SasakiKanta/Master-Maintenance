@@ -664,6 +664,6 @@ class CustomersController extends Controller
      * @param $values
      */
     public function csverror($errors){
-        $errors
+        $errors;
     }
 }
