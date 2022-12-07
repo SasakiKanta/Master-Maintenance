@@ -17,7 +17,6 @@ return [
     'max'    => [
         'string'  => ':attributeは、:max文字以下で指定してください。',
     ],
-    'string' => ':attributeは文字列を入力して下さい。',
     'numeric' => ':attributeは数値列を入力して下さい。',
     'digits' => ':attributeは:digits桁の数値列を入力してください',
     'email'  => 'メールアドレスの形式で入力してください。',
@@ -31,5 +30,4 @@ return [
     'alpha_num' => ':attributeは半角英数字で入力してください',
     'integer' => ':attributeは整数で入力してください。',
     'regex' => ':attributeはハイフンなし数字7桁で入力してください。',
-    'exists' => ':attributeではありません。',
 ];

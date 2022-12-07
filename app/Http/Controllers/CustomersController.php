@@ -14,6 +14,9 @@ use App\Models\Supplier;
 use App\Models\Zipcode;
 use Exception;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Enum;
+
 
 /**
  * 利用者マスタ検索 コントローラークラス
@@ -553,13 +556,17 @@ class CustomersController extends Controller
         ];
         //ファイルを保存
         $request->csvfile->storeAs('public/', "customers.csv");
+
         //ファイル内容を取得
         $csv = Storage::disk('local')->get('public/customers.csv');
+
+        //配列に変換
         $csv = str_replace("\"", '', $csv);
         $array = explode("\n", $csv);
         $array = array_filter($array, "strlen");
         $array = array_values($array);
 
+        //DBに登録できる形に変更
         foreach ($array as $row) {
             $arr = explode(",", $row);
             $arr = array_combine($columu, $arr);
@@ -571,15 +578,92 @@ class CustomersController extends Controller
             array_push($values, $arr);
         }
 
+        //ヘッダーを削除
         array_shift($values);
 
+
+        //入力チェック
+        $this->validation($values);
+
+        //登録処理
         foreach ($values as $value) {
             $id = $value['id'];
             $inputAll = $value;
             $this->upsert($id, $inputAll);
         }
+
         return view('customers',[
             'is_upload' =>  true,
         ]);
+    }
+
+    /**
+     * バリデーションチェック
+     * @param $values
+     */
+    public function validation($values){
+        $messages = [
+            'required' => ':attributeは必ず指定してください。',
+            'string' => ':attributeは文字列を入力して下さい。',
+            'max'    => [
+                'string'  => ':attributeは、:max文字以下で指定してください。',
+            ],
+            'enum' => ':attributeの登録がありません。',
+            'email'  => 'メールアドレスの形式で入力してください。',
+            'unique' => ':attributeは既に使用されています。',
+            'regex' => ':attributeはハイフンなし数字7桁で入力してください。',
+            'exists' => ':attributeの登録がありません。',
+        ];
+
+        $attributes =[
+            //CustomerRequest::
+            'surname'       =>      '姓',
+            'name'          =>      '名',
+            'surname_kana'  =>      '姓（フリガナ）',
+            'name_kana'     =>      '名（フリガナ）',
+            'gender'        =>      '性別',
+            'birthday'      =>      '生年月日',
+            'email'         =>      'メールアドレス',
+            'zip'           =>      '郵便番号',
+            'addr_1'        =>      '市区群町村',
+            'addr_2'        =>      '番地・町域',
+            'addr_3'        =>      'マンション・建物名',
+            'supplier_id'   =>      '取引先',
+            'position'      =>      '肩書',
+        ];
+
+        foreach ($values as $value) {
+            $id = $value['id'];
+            $validator = Validator::make($value, [
+                'surname'       =>      ['required', 'string', 'max:25'],
+                'name'          =>      ['required', 'string', 'max:25'],
+                'surname_kana'  =>      ['string', 'max:50', 'nullable'],
+                'name_kana'     =>      ['string', 'max:50', 'nullable'],
+                'gender'        =>      [new Enum(Gender::class)],
+                'birthday'      =>      ['required'],
+                'email'         =>      ['required', 'string', 'email', 'max:254', "unique:customers,email,${id},id,deleted_at,NULL"],
+                'zip'           =>      ['regex:/^[0-9]{7}$/', 'nullable'],
+                'addr_1'        =>      ['max:100'],
+                'addr_2'        =>      ['max:100'],
+                'addr_3'        =>      ['max:100'],
+                'supplier_id'   =>      ['required', 'exists:suppliers,id'],
+                'position'      =>      ['max:100'],
+            ], $messages, $attributes);
+
+        }
+        if ($validator->fails()){
+            throw new Exception('バリデーションエラー');
+        } else {
+            return $values;
+        }
+    }
+
+
+    /**
+     * バリデーションチェック
+     * @param $values
+     */
+    public function csverror($errors){
+        $errors
     }
 }
