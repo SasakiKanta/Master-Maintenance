@@ -66,5 +66,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('csv', [CustomersController::class, 'csv'])->name('customers.csv');
         Route::get('zip', [CustomersController::class, 'zip'])->name('customers.zip');
         Route::post('upload', [CustomersController::class, 'upload'])->name('customers.upload');
+        Route::get('errorCsv', [CustomersController::class, 'errorCsv'])->name('customers.errorCsv');
     });
 });

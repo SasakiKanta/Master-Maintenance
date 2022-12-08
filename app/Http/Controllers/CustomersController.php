@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Supplier;
 use App\Models\Zipcode;
 use Exception;
+use Facade\FlareClient\View;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
@@ -56,7 +58,9 @@ class CustomersController extends Controller
             return $this->doSearch($request);
         }
 
-        return view('customers');
+        return view('customers',[
+            'is_upload' =>  "",
+        ]);
     }
 
     /**
@@ -352,6 +356,7 @@ class CustomersController extends Controller
             'supplier_name' =>      $supplier_name,
             'sort'          =>      $sort,
             'customers'     =>      $customers,
+            'is_upload'     =>      '',
         ]);
     }
 
@@ -554,11 +559,15 @@ class CustomersController extends Controller
             'supplier_name',
             'position',
         ];
+
+        //ファイル名を取得
+        $file_name = $request->csvfile->getClientOriginalName();
+
         //ファイルを保存
-        $request->csvfile->storeAs('public/', "customers.csv");
+        $request->csvfile->storeAs('public/csv', $file_name);
 
         //ファイル内容を取得
-        $csv = Storage::disk('local')->get('public/customers.csv');
+        $csv = Storage::disk('local')->get("public/csv/{$file_name}");
 
         //配列に変換
         $csv = str_replace("\"", '', $csv);
@@ -570,11 +579,6 @@ class CustomersController extends Controller
         foreach ($array as $row) {
             $arr = explode(",", $row);
             $arr = array_combine($columu, $arr);
-            unset($arr['customer_type']);
-            unset($arr['customer_type_label']);
-            unset($arr['gender_label']);
-            unset($arr['prefcode_label']);
-            unset($arr['supplier_name']);
             array_push($values, $arr);
         }
 
@@ -583,25 +587,34 @@ class CustomersController extends Controller
 
 
         //入力チェック
-        $this->validation($values);
-
-        //登録処理
-        foreach ($values as $value) {
-            $id = $value['id'];
-            $inputAll = $value;
-            $this->upsert($id, $inputAll);
+        $is_upload = $this->validation($values, $file_name);
+        if (is_array($is_upload)) {
+            return view('customers', [
+                'is_upload' => $is_upload[0],
+                'file_name' => $is_upload[1],
+            ]);
+        } else {
+            //登録処理
+            foreach ($values as $value) {
+                $id = $value['id'];
+                $inputAll = $value;
+                $this->upsert($id, $inputAll);
+            }
+            return view('customers', [
+                'is_upload' => $is_upload,
+            ]);
         }
-
-        return view('customers',[
-            'is_upload' =>  true,
-        ]);
     }
 
     /**
      * バリデーションチェック
      * @param $values
      */
-    public function validation($values){
+    public function validation($values, $file_name){
+        //csvErrorへ渡す変数を用意
+        $errors = [];
+
+        //エラーメッセージ
         $messages = [
             'required' => ':attributeは必ず指定してください。',
             'string' => ':attributeは文字列を入力して下さい。',
@@ -615,8 +628,8 @@ class CustomersController extends Controller
             'exists' => ':attributeの登録がありません。',
         ];
 
+        //属性値
         $attributes =[
-            //CustomerRequest::
             'surname'       =>      '姓',
             'name'          =>      '名',
             'surname_kana'  =>      '姓（フリガナ）',
@@ -632,6 +645,7 @@ class CustomersController extends Controller
             'position'      =>      '肩書',
         ];
 
+        //入力チェック処理
         foreach ($values as $value) {
             $id = $value['id'];
             $validator = Validator::make($value, [
@@ -650,20 +664,70 @@ class CustomersController extends Controller
                 'position'      =>      ['max:100'],
             ], $messages, $attributes);
 
+            $error = $validator->errors()->all();
+            $error = implode(",", $error);
+            $errorCsv = implode(",", $value);
+            $errorCsv .= "," . $error;
+            $errorCsv = explode(",", $errorCsv);
+            array_push($errors, $errorCsv);
         }
+
+        //エラーがあった場合、csvErrorへ
         if ($validator->fails()){
-            throw new Exception('バリデーションエラー');
-        } else {
-            return $values;
+            $file_name = $this->csvError($errors, $file_name);
+            $is_upload = false;
+            $is_upload = array($is_upload, $file_name);
+            return $is_upload;
         }
+        $is_upload = true;
+        return $is_upload;
     }
 
 
     /**
-     * バリデーションチェック
+     * バリデーションエラー時のcsv作成
+     *
      * @param $values
+     * @return view
      */
-    public function csverror($errors){
-        $errors;
+    public function csvError($errors, $file_name){
+        $file_name = 'エラー' . $file_name;
+        $stream = fopen("../storage/app/public/csv/$file_name", 'w');
+        //csvのヘッダーを作成
+        $headline = "ID,\"顧客区分CD\",\"顧客区分\",\"姓\",\"名\",\"姓（フリガナ）\",\"名（フリガナ）\",\"性別CD\",\"性別\",\"生年月日\",\"郵便番号\",\"都道府県CD\",\"都道府県\",\"市区群町村\",\"番地・町名\",\"マンション・建物名など\",\"電話番号\",\"メールアドレス\",\"取引先コード\",\"取引先名\",\"肩書\"\n";
+        fwrite($stream, $headline);
+        foreach ($errors as $error) {
+            $out = "";
+            $cnt = 1;
+            foreach($error as $key => $value) {
+                if($key == 0){
+                    $out .= $value;
+                } else {
+                    $out .= "\"" . $value . "\"";
+                }
+                if($cnt< count($error)){
+                    $out .= ",";
+                } else {
+                    $out .= "\n";
+                }
+                $cnt++;
+            }
+            fwrite($stream, $out);
+        }
+        rewind($stream);
+        fclose($stream);
+        return $file_name;
+    }
+
+
+    /**
+     * アップロードファイルからの登録処理
+     *
+     * @param Request $request
+     */
+    public function errorCsv(Request $request){
+        $name = request()->all();
+        $name = $name["name"];
+        return Storage::download("public/csv/$name");
     }
 }

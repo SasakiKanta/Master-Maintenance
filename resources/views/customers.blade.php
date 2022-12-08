@@ -65,8 +65,10 @@
           <?php } ?>
           <input type="file" class="bg-gray-50 ml-4 border" name="csvfile" id="csvfile" onchange="uploadChange();">
           <button type="button" id="upload" class="search-btn ml-4" style="display: none" onclick="fileSubmit();">アップロード</button>
-          @if ($is_upload ?? "")
+          @if ($is_upload === true)
           <a href="#">正常終了</a>
+          @elseif ($is_upload === false)
+          <a href="/customers/errorCsv/?name={{$file_name}}">エラーあり（{{$file_name}}）</a>
           @endif
           <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('customers.entry') }}';return false;">新規登録</button>
         </div>
