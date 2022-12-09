@@ -579,16 +579,25 @@ class CustomersController extends Controller
         foreach ($array as $row) {
             $arr = explode(",", $row);
             if (!(count($arr) == count($columu))) {
-                Storage::append("public/csv/{$file_name}", "項目が足りません。");
-                return view('customers',[
-                    'is_upload' => false,
-                    'file_name' => $file_name,
-                ]);
-            }
+                array_push($arr, '項目数が違います。');
+                if (isset($errors)) {
+                    array_push($errors, $arr);
+                } else {
+                    $errors = [];
+                    array_push($errors, $arr);
+                }
+            } else {
             $arr = array_combine($columu, $arr);
             array_push($values, $arr);
+            }
         }
-
+        if (isset($errors)) {
+            $file_name = $this->csvError($errors, $file_name);
+            return view('customers',[
+                'is_upload' => false,
+                'file_name' => $file_name,
+            ]);
+        }
         //ヘッダーを削除
         array_shift($values);
 
