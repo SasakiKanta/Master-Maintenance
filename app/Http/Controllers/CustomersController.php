@@ -579,7 +579,11 @@ class CustomersController extends Controller
         foreach ($array as $row) {
             $arr = explode(",", $row);
             if (!(count($arr) == count($columu))) {
-                throw new Exception('csvファイルの内容が正しくありません。');
+                Storage::append("public/csv/{$file_name}", "項目が足りません。");
+                return view('customers',[
+                    'is_upload' => false,
+                    'file_name' => $file_name,
+                ]);
             }
             $arr = array_combine($columu, $arr);
             array_push($values, $arr);
@@ -697,9 +701,6 @@ class CustomersController extends Controller
      *
      */
     public function csvError($errors, $file_name){
-        //名前変更
-        $file_name = 'エラー' . $file_name;
-
         $stream = fopen("../storage/app/public/csv/$file_name", 'w');
 
         //csvのヘッダーを作成
