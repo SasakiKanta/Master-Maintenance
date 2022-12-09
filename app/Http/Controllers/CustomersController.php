@@ -721,12 +721,12 @@ class CustomersController extends Controller
 
 
     /**
-     * アップロードファイルからの登録処理
+     *
      *
      * @param Request $request
      */
     public function errorCsv(Request $request){
-        $name = request()->all();
+        $name = $request->all();
         $name = $name["name"];
         return Storage::download("public/csv/$name");
     }
