@@ -61,14 +61,14 @@
           <button type="submit" class="search-btn">検索</button>
           <button type="button" class="clear-btn ml-4" onclick="location.href='{{ route('customers') }}';return false;">クリア</button>
           <?php if (isset($customers)) {  ?>
-          <button type="button" class="search-btn ms-4" onclick="location.href='{{ route('customers.csv') }}';return false;">CSVダウンロード</button>
+          <button type="button" class="search-btn ml-4" onclick="location.href='{{ route('customers.csv') }}';return false;">CSVダウンロード</button>
           <?php } ?>
-          <input type="file" class="bg-gray-50 ml-4 border" name="csvfile" id="csvfile" onchange="uploadChange();">
-          <button type="button" id="upload" class="search-btn ml-4" style="display: none" onclick="fileSubmit();">アップロード</button>
+          <input type="file" name="csvfile" id="csvfile" class="ml-12 block text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" onchange="uploadChange()">
+          <button type="button" id="upload" class="search-btn ml-2" style="display: none" onclick="fileSubmit();">アップロード</button>
           @if ($is_upload === true)
-          <a href="#">正常終了</a>
+          <a href="#" class="my-auto ml-4">正常終了</a>
           @elseif ($is_upload === false)
-          <a href="/customers/errorCsv/?name={{$file_name}}">エラーあり（{{$file_name}}）</a>
+          <a href="/customers/errorCsv/?name={{$file_name}}" class="my-auto ml-4">エラーあり（{{$file_name}}）</a>
           @endif
           <button type="button" class="new-btn ml-auto" onclick="location.href='{{ route('customers.entry') }}';return false;">新規登録</button>
         </div>

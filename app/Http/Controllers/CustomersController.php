@@ -578,6 +578,9 @@ class CustomersController extends Controller
         //DBに登録できる形に変更
         foreach ($array as $row) {
             $arr = explode(",", $row);
+            if (!(count($arr) == count($columu))) {
+                throw new Exception('csvファイルの内容が正しくありません。');
+            }
             $arr = array_combine($columu, $arr);
             array_push($values, $arr);
         }
@@ -588,12 +591,14 @@ class CustomersController extends Controller
 
         //入力チェック
         $is_upload = $this->validation($values, $file_name);
+
+        //入力チェックが成功したら登録
         if (is_array($is_upload)) {
             return view('customers', [
                 'is_upload' => $is_upload[0],
                 'file_name' => $is_upload[1],
             ]);
-        } else {
+        } elseif ($is_upload === true) {
             //登録処理
             foreach ($values as $value) {
                 $id = $value['id'];
@@ -608,7 +613,7 @@ class CustomersController extends Controller
 
     /**
      * バリデーションチェック
-     * @param $values
+     * @param $values, $file_name
      */
     public function validation($values, $file_name){
         //csvErrorへ渡す変数を用意
@@ -664,6 +669,7 @@ class CustomersController extends Controller
                 'position'      =>      ['max:100'],
             ], $messages, $attributes);
 
+            //エラー内容をcavに追加
             $error = $validator->errors()->all();
             $error = implode(",", $error);
             $errorCsv = implode(",", $value);
@@ -687,18 +693,25 @@ class CustomersController extends Controller
     /**
      * バリデーションエラー時のcsv作成
      *
-     * @param $values
-     * @return view
+     * @param $errors, $file_name
+     *
      */
     public function csvError($errors, $file_name){
+        //名前変更
         $file_name = 'エラー' . $file_name;
+
         $stream = fopen("../storage/app/public/csv/$file_name", 'w');
+
         //csvのヘッダーを作成
         $headline = "ID,\"顧客区分CD\",\"顧客区分\",\"姓\",\"名\",\"姓（フリガナ）\",\"名（フリガナ）\",\"性別CD\",\"性別\",\"生年月日\",\"郵便番号\",\"都道府県CD\",\"都道府県\",\"市区群町村\",\"番地・町名\",\"マンション・建物名など\",\"電話番号\",\"メールアドレス\",\"取引先コード\",\"取引先名\",\"肩書\"\n";
         fwrite($stream, $headline);
+
+        //csvの内容の作成
         foreach ($errors as $error) {
             $out = "";
             $cnt = 1;
+
+            //囲み文字を入れる処理
             foreach($error as $key => $value) {
                 if($key == 0){
                     $out .= $value;
@@ -721,13 +734,16 @@ class CustomersController extends Controller
 
 
     /**
-     *
+     *エラー時のcsvファイルダウンロード
      *
      * @param Request $request
      */
     public function errorCsv(Request $request){
+        //ファイルの名前を取得
         $name = $request->all();
         $name = $name["name"];
+
+        //csvファイルをダウンロード
         return Storage::download("public/csv/$name");
     }
 }

@@ -42,8 +42,8 @@
             @csrf
             <input type="hidden" id="form-method" name="_method" value="{{ $id? 'POST': 'PUT'; }}">
             <div>
-                <div class="d-flex justify-content-start mb-4">
-                    <div class="me-3 col">
+                <div class="flex mb-4">
+                    <div class="mr-4 w-1/3">
                     <label for="surname" class="label">姓<span class="require-label"></span></label>
                     <input type="text" id="surname" name="surname" value="{{old('surname', $surname)}}"
                         class="@error('surname') error-text @enderror input-text" placeholder="">
@@ -51,7 +51,7 @@
                     <p class="valid-msg">{{ $message }}</p>
                     @enderror
                     </div>
-                    <div class="me-3 col">
+                    <div class="mr-4 w-1/3">
                     <label for="name" class="label">名<span class="require-label"></span></label>
                     <input type="text" id="name" name="name" value="{{old('name', $name)}}"
                         class="@error('name') error-text @enderror input-text" placeholder="">
@@ -59,7 +59,7 @@
                         <p class="valid-msg">{{ $message }}</p>
                     @enderror
                     </div>
-                    <div class="text-center col">
+                    <div class="w-1/3">
                     <label class="label">顧客区分</label>
                     <?php foreach (\App\Enums\CustomerType::cases() as $case) { ?>
                         <label>
@@ -72,8 +72,8 @@
                     <?php } ?>
                     </div>
                 </div>
-                <div class="d-flex justify-content-start mb-4">
-                    <div class="me-3 col-4">
+                <div class="flex mb-4">
+                    <div class="mr-4 w-1/3">
                         <label for="surname_kana" class="label">姓（フリガナ）</label>
                         <input type="text" id="surname_kana" name="surname_kana" value="{{old('surname_kana', $surname_kana)}}"
                         class="@error('surname_kana') error-text @enderror input-text" placeholder="">
@@ -81,7 +81,7 @@
                         <p class="valid-msg">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="col-4">
+                    <div class="w-1/3">
                         <label for="surname_kana" class="label">名（フリガナ）</label>
                         <input type="text" id="name_kana" name="name_kana" value="{{old('name_kana', $name_kana)}}"
                         class="@error('name_kana') error-text @enderror input-text" placeholder="">
@@ -90,8 +90,8 @@
                         @enderror
                     </div>
                 </div>
-                <div class="d-flex justify-content-start mb-4">
-                    <div class="me-3 col-4">
+                <div class="flex mb-4">
+                    <div class="mr-4 w-1/3">
                         <label for="gender_type" class="label">性別</label>
                         <?php foreach (\App\Enums\Gender::cases() as $case) { ?>
                             <label><input type="radio" id="gender" name="gender" value="{{ $case->value }}"
@@ -105,7 +105,7 @@
                         <p class="valid-msg">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="col-4">
+                    <div class="w-1/3">
                         <label for="birthyday" class="label">生年月日<span class="require-label"></span></label>
                         <input type="date" id="birthday" name="birthday" value="{{old('birthday', $birthday)}}"
                         class="@error('birthday') error-text @enderror input-text" placeholder="">
@@ -114,8 +114,8 @@
                         @enderror
                     </div>
                 </div>
-                <div class="d-flex align-items-end mb-4">
-                    <div class="me-3 col-2">
+                <div class="flex mb-4 items-end">
+                    <div class="mr-4 w-1/6">
                         <label for="zip" class="label">郵便番号</label>
                         <input type="text" id="zip" name="zip" value="{{old('zip', $zip)}}"
                         class="@error('zip') error-text @enderror input-text" placeholder="">
@@ -123,10 +123,10 @@
                         <p class="valid-msg">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="col-2">
-                        <button type="button" class="btn btn-secondary" onclick="zipcodesearch()">住所検索</button>
+                    <div class="mr4 w-1/6">
+                        <button type="button" class="clear-btn" onclick="zipcodesearch()">住所検索</button>
                     </div>
-                    <div class="col-4">
+                    <div class="w-1/3">
                         <label for="prefcode" class="label">都道府県</label>
                         <select id="prefcode" name='prefcode' class="input-text @error('prefcode') error-text @enderror input-text">
                         <option value="">選択してください</option>
@@ -140,8 +140,8 @@
                         @enderror
                     </div>
                 </div>
-                <div class="d-flex justify-content-start mb-4">
-                    <div class="me-3 col">
+                <div class="flex mb-4">
+                    <div class="mr-4 w-1/3">
                         <label for="addr_1" class="label">市区群町村</label>
                         <input type="text" id="addr_1" name="addr_1" value="{{old('addr_1', $addr_1)}}"
                         class="@error('addr_1') error-text @enderror input-text" placeholder="">
@@ -149,7 +149,7 @@
                         <p class="valid-msg">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="me-3 col">
+                    <div class="mr-4 w-1/3">
                         <label for="addr_2" class="label">町名・番地</label>
                         <input type="text" id="addr_2" name="addr_2" value="{{old('addr_2', $addr_2)}}"
                         class="@error('addr_2') error-text @enderror input-text-md" placeholder="">
@@ -157,7 +157,7 @@
                         <p class="valid-msg">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="col">
+                    <div class="w-1/3">
                         <label for="addr_3" class="label">マンション・建物名など</label>
                         <input type="text" id="addr_3" name="addr_3" value="{{old('addr_3', $addr_3)}}"
                         class="@error('addr_3') error-text @enderror input-text" placeholder="">
@@ -166,8 +166,8 @@
                         @enderror
                     </div>
                 </div>
-                <div class="d-flex justify-content-start mb-4">
-                    <div class="me-3 col-4">
+                <div class="flex mb-4">
+                    <div class="mr-4 w-1/3">
                         <label for="tel" class="label">電話番号</label>
                         <input type="text" id="tel" name="tel" value="{{old('tel', $tel)}}"
                         class="@error('tel') error-text @enderror input-text" placeholder="">
@@ -175,7 +175,7 @@
                         <p class="valid-msg">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="col-8">
+                    <div class="mr-4 w-2/3">
                         <label for="email" class="label">メールアドレス<span class="require-label"></span></label>
                         <input type="text" id="email" name="email" value="{{old('email', $email)}}"
                         class="@error('email') error-text @enderror input-text" placeholder="">
@@ -184,8 +184,8 @@
                         @enderror
                     </div>
                 </div>
-                <div class="d-flex justify-content-start">
-                    <div class="me-3 col mb-4" id="supplier_name"  style="@if(!(old('customer_type', $customer_type) == 2)) display: none @endif">
+                <div class="flex">
+                    <div class="mr-4 w-1/3" id="supplier_name"  style="@if(!(old('customer_type', $customer_type) == 2)) display: none @endif">
                         <label for="supplier_id" class="label">取引先名<span class="require-label"></span></label>
                         <select id="supplier_id" name='supplier_id' class="@error('supplier_id') error-text @enderror input-text">
                         <option value="">選択してください</option>
@@ -200,7 +200,7 @@
                         <p class="valid-msg">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="col mb-4" id="title"  style="@if(!(old('customer_type', $customer_type) == 2)) display: none @endif">
+                    <div class="w-1/3" id="title"  style="@if(!(old('customer_type', $customer_type) == 2)) display: none @endif">
                         <label for="position" class="label">肩書</label>
                         <input type="text" id="position" name="position" value="{{old('position', $position)}}"
                         class="@error('position') error-text @enderror input-text" placeholder="">
@@ -219,7 +219,7 @@
                     </div>
                     <div class="flex">
                     <!-- 登録・更新ボタン -->
-                    <button type="submit" class="update-btn">
+                    <button type="submit" class="update-btn ">
                         @if($id)
                         更新
                         @else
