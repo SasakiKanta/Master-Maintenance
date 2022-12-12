@@ -143,7 +143,6 @@ class CustomersController extends Controller
     {
         // リクエストパラメータの取得
         $inputAll = $request->all();
-
         // 登録内部処理
         $customer = $this->upsert($id, $inputAll);
         $customerId = $customer->id;
@@ -682,7 +681,7 @@ class CustomersController extends Controller
                 'position'      =>      ['max:100'],
             ], $messages, $attributes);
 
-            //エラー内容をcavに追加
+            //エラー内容をcsvに追加
             $error = $validator->errors()->all();
             $error = implode(",", $error);
             $errorCsv = implode(",", $value);
@@ -713,7 +712,7 @@ class CustomersController extends Controller
         $stream = fopen("../storage/app/public/csv/$file_name", 'w');
 
         //csvのヘッダーを作成
-        $headline = "ID,\"顧客区分CD\",\"顧客区分\",\"姓\",\"名\",\"姓（フリガナ）\",\"名（フリガナ）\",\"性別CD\",\"性別\",\"生年月日\",\"郵便番号\",\"都道府県CD\",\"都道府県\",\"市区群町村\",\"番地・町名\",\"マンション・建物名など\",\"電話番号\",\"メールアドレス\",\"取引先コード\",\"取引先名\",\"肩書\"\n";
+        $headline = "ID,\"顧客区分CD\",\"顧客区分\",\"姓\",\"名\",\"姓（フリガナ）\",\"名（フリガナ）\",\"性別CD\",\"性別\",\"生年月日\",\"郵便番号\",\"都道府県CD\",\"都道府県\",\"市区群町村\",\"番地・町名\",\"マンション・建物名など\",\"電話番号\",\"メールアドレス\",\"取引先コード\",\"取引先名\",\"肩書\",\"エラー内容\"\n";
         fwrite($stream, $headline);
 
         //csvの内容の作成
