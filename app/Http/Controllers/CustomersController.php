@@ -683,7 +683,7 @@ class CustomersController extends Controller
 
             //エラー内容をcsvに追加
             $error = $validator->errors()->all();
-            $error = implode(",", $error);
+            $error = implode("", $error);
             $errorCsv = implode(",", $value);
             $errorCsv .= "," . $error;
             $errorCsv = explode(",", $errorCsv);
