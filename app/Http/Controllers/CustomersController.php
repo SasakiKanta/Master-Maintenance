@@ -630,7 +630,7 @@ class CustomersController extends Controller
     public function validation($values, $file_name){
         //csvErrorへ渡す変数を用意
         $errors = [];
-
+        $object = new CustomerRequest();
         //エラーメッセージ
         $messages = [
             'required' => ':attributeは必ず指定してください。',
@@ -646,21 +646,7 @@ class CustomersController extends Controller
         ];
 
         //属性値
-        $attributes =[
-            'surname'       =>      '姓',
-            'name'          =>      '名',
-            'surname_kana'  =>      '姓（フリガナ）',
-            'name_kana'     =>      '名（フリガナ）',
-            'gender'        =>      '性別',
-            'birthday'      =>      '生年月日',
-            'email'         =>      'メールアドレス',
-            'zip'           =>      '郵便番号',
-            'addr_1'        =>      '市区群町村',
-            'addr_2'        =>      '番地・町域',
-            'addr_3'        =>      'マンション・建物名',
-            'supplier_id'   =>      '取引先',
-            'position'      =>      '肩書',
-        ];
+        $attributes = $object->attributes();
 
         //入力チェック処理
         foreach ($values as $value) {
