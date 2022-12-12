@@ -15,6 +15,7 @@ use App\Models\Zipcode;
 use Exception;
 use Facade\FlareClient\View;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
@@ -290,12 +291,6 @@ class CustomersController extends Controller
 
         $query = Customer::query();
 
-        /*$query->select([
-            'c.*',
-            's.name',
-        ])->from('customers as c')->leftjoin('suppliers as s', 'c.supplier_id' , '=' , 's.id');
-        */
-
         $query->select([
             'customers.id',
             'customers.full_name',
@@ -387,6 +382,7 @@ class CustomersController extends Controller
 
         //csvファイルに必要なクエリの作成
         $customers = Customer::query();
+
         $customers->select([
             'customers.id',
             'customers.customer_type',
@@ -590,6 +586,8 @@ class CustomersController extends Controller
             array_push($values, $arr);
             }
         }
+
+        //項目数が違う場合、エラー処理へ
         if (isset($errors)) {
             $file_name = $this->csvError($errors, $file_name);
             return view('customers',[
@@ -597,6 +595,7 @@ class CustomersController extends Controller
                 'file_name' => $file_name,
             ]);
         }
+
         //ヘッダーを削除
         array_shift($values);
 
@@ -631,6 +630,7 @@ class CustomersController extends Controller
         //csvErrorへ渡す変数を用意
         $errors = [];
         $object = new CustomerRequest();
+
         //エラーメッセージ
         $messages = [
             'required' => ':attributeは必ず指定してください。',
