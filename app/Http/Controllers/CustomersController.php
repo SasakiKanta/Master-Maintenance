@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use App\Models\Supplier;
 use App\Models\Zipcode;
+use DateTime;
 use Exception;
 use Facade\FlareClient\View;
 use Illuminate\Support\Facades\File;
@@ -371,6 +372,7 @@ class CustomersController extends Controller
      * @param Request $request
      */
     public function csv(Request $request){
+        $time = date('YmdHis');
         //セッションから値を復元
         $name           =       Session::get("{$this->SESSION_KEY}.NAME", '');
         $name_kana      =       Session::get("{$this->SESSION_KEY}.NAME_KANA", '');
@@ -499,7 +501,7 @@ class CustomersController extends Controller
         fclose($stream);
         $headers = array(
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=顧客データ_YYYYMMDDHHMMSS.csv'
+            'Content-Disposition' => "attachment; filename=顧客データ_$time.csv"
         );
         return response()->make($csv, 200, $headers);
     }
@@ -530,7 +532,13 @@ class CustomersController extends Controller
      * @param Request $request
      */
     public function upload(Request $request){
+        //項目数エラーの配列
+        $item_errors = [];
+
+        //バリデーションに渡す配列
         $values = [];
+
+        //カラム名の配列
         $columu = [
             'id',
             'customer_type',
@@ -573,35 +581,38 @@ class CustomersController extends Controller
         //DBに登録できる形に変更
         foreach ($array as $row) {
             $arr = explode(",", $row);
-            if (!(count($arr) == count($columu))) {
+
+            if (strpos($array[0], 'エラー内容') && count($arr) == 22){
+                //エラー内容がある場合の処理
+                array_pop($arr);
+                $arr = array_combine($columu, $arr);
+                array_push($values, $arr);
+            } elseif (!(count($arr) == count($columu))) {
+                //項目数が違う場合の処理
                 array_push($arr, '項目数が違います。');
-                if (isset($errors)) {
-                    array_push($errors, $arr);
-                } else {
-                    $errors = [];
-                    array_push($errors, $arr);
-                }
+                array_push($item_errors, $arr);
             } else {
-            $arr = array_combine($columu, $arr);
-            array_push($values, $arr);
+                //項目数が正しい場合の処理
+                $arr = array_combine($columu, $arr);
+                array_push($values, $arr);
             }
         }
 
         //項目数が違う場合、エラー処理へ
-        if (isset($errors)) {
+        /*if (isset($errors)) {
             $file_name = $this->csvError($errors, $file_name);
             return view('customers',[
                 'is_upload' => false,
                 'file_name' => $file_name,
             ]);
-        }
+        }*/
 
         //ヘッダーを削除
         array_shift($values);
 
 
         //入力チェック
-        $is_upload = $this->validation($values, $file_name);
+        $is_upload = $this->validation($values, $file_name, $item_errors);
 
         //入力チェックが成功したら登録
         if (is_array($is_upload)) {
@@ -626,9 +637,13 @@ class CustomersController extends Controller
      * バリデーションチェック
      * @param $values, $file_name
      */
-    public function validation($values, $file_name){
+    public function validation($values, $file_name, $item_errors){
+        //エラーがあった場合の正しい値を保存する変数を用意
+        $register = [];
+
         //csvErrorへ渡す変数を用意
         $errors = [];
+
         $object = new CustomerRequest();
 
         //エラーメッセージ
@@ -667,17 +682,35 @@ class CustomersController extends Controller
                 'position'      =>      ['max:100'],
             ], $messages, $attributes);
 
-            //エラー内容をcsvに追加
+            //エラーがあれば$errorへ代入
             $error = $validator->errors()->all();
-            $error = implode("", $error);
-            $errorCsv = implode(",", $value);
-            $errorCsv .= "," . $error;
-            $errorCsv = explode(",", $errorCsv);
-            array_push($errors, $errorCsv);
+
+            //エラーがあれば$errorsへ、エラーがなければ$registerへ
+            if (!(is_array($error) && empty($error))) {
+                $error = implode("", $error);
+                $errorCsv = implode(",", $value);
+                $errorCsv .= "," . $error;
+                $errorCsv = explode(",", $errorCsv);
+                array_push($errors, $errorCsv);
+            } else {
+                array_push($register, $value);
+            }
         }
 
-        //エラーがあった場合、csvErrorへ
-        if ($validator->fails()){
+        //項目数のエラーがあった場合、$errorsに追加
+        if (!empty($item_errors)) {
+            foreach ($item_errors as $item_error) {
+                array_push($errors, $item_error);
+            }
+        }
+
+        //エラーがあった場合、$registerをdbに登録後、csvErrorへ
+        if (!empty($errors)){
+            foreach ($register as $row) {
+                $id = $row['id'];
+                $inputAll = $row;
+                $this->upsert($id, $inputAll);
+            }
             $file_name = $this->csvError($errors, $file_name);
             $is_upload = false;
             $is_upload = array($is_upload, $file_name);
