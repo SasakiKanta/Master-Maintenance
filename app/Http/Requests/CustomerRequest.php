@@ -47,13 +47,6 @@ class CustomerRequest extends FormRequest
             'supplier_id'   =>      [],
             'position'      =>      [],
         ];
-        // if ($customer_type == 1) {
-        //     return $rule;
-        // } elseif ($customer_type == 2) {
-        //     $rule['supplier_id'] = 'required|exists:suppliers,id';
-        //     $rule['position'] = 'max:100';
-        //     return $rule;
-        // }
 
         // 顧客区分が「2:法人」の場合
         if ($customer_type == 2) {
