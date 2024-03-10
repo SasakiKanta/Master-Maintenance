@@ -444,6 +444,15 @@ class CustomersController extends Controller
         }
         // 第2ソート
         $customers = $customers->orderBy('customers.id');
+
+        /*$stream = fopen('./test.csv' , 'w');
+
+        $headline = "ID,\"顧客区分CD\",\"顧客区分\",\"姓\",\"名\",\"姓（フリガナ）\",\"名（フリガナ）\",\"性別CD\",\"性別\",\"生年月日\",\"郵便番号\",\"都道府県CD\",\"都道府県\",\"市区群町村\",\"番地・町名\",\"マンション・建物名など\",\"電話番号\",\"メールアドレス\",\"取引先コード\",\"取引先名\",\"肩書\"\n";
+
+        $customers->chunk(1, function($db) {
+            fputcsv($stream, $db , "," , "\"", "\n");
+        });*/
+
         $customers = $customers->get();
 
         $stream = fopen('php://temp', 'w');
